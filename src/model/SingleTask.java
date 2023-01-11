@@ -10,9 +10,7 @@ public class SingleTask extends Task{
         this.taskType = taskType;
     }
 
-    // метод ниже не совсем понятен
-    @Override
-    public SingleTask withTaskStatus(TaskStatus taskStatus) {
+    public SingleTask withNewTaskStatus(TaskStatus taskStatus) {
         return new SingleTask(
                this.getTaskName(),
                this.getTaskId(),

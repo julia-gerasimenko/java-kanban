@@ -4,47 +4,39 @@ import java.util.ArrayList;
 
 public class EpicTask extends Task {
     private ArrayList<SubTask> subTasks;
+    private TaskStatus taskStatus;
     private Type taskType;
 
-    public EpicTask(String taskName, int taskId, String taskDescription, ArrayList<SubTask> subTasks, Type taskType) {
+    public EpicTask(String taskName, int taskId, String taskDescription, ArrayList<SubTask> subTasks,
+                    TaskStatus taskStatus, Type taskType) {
         super(taskName, taskId, taskDescription);
         this.subTasks = subTasks;
+        this.taskStatus = taskStatus;
         this.taskType = taskType;
     }
 
     @Override
-    public SingleTask withTaskStatus(TaskStatus taskStatus) {
-        return new SingleTask(
-                this.getTaskName(),
-                this.getTaskId(),
-                this.getTaskDescription(),
-                getTaskStatus(),
-                this.getType());
-    }
-
-    @Override
     public TaskStatus getTaskStatus() {
-        TaskStatus epicTaskStatus = null;
-        int taskStatusQuantity = 1;
+        TaskStatus taskStatus = null;
+        int taskStatusQuantity = 0;
 
         for (SubTask subTask : subTasks) {
-            if (subTask.getTaskStatus() == TaskStatus.NEW) {
+            if (subTask.getTaskStatus().equals(TaskStatus.NEW)) {
                 taskStatusQuantity++;
                 if (taskStatusQuantity == subTasks.size()) {
-                    epicTaskStatus = TaskStatus.NEW;
+                    taskStatus = TaskStatus.NEW;
                 };
-            } else if (subTask.getTaskStatus() == TaskStatus.DONE) {
+            } else if (subTask.getTaskStatus().equals(TaskStatus.DONE)) {
                 taskStatusQuantity++;
                 if (taskStatusQuantity == subTasks.size()) {
-                    epicTaskStatus = TaskStatus.DONE;
+                    taskStatus = TaskStatus.DONE;
                 }
             } else {
-                epicTaskStatus = TaskStatus.IN_PROGRESS;
+                taskStatus = TaskStatus.IN_PROGRESS;
             }
         }
-        return epicTaskStatus;
+        return taskStatus;
     }
-
     public ArrayList<SubTask> getSubTasks() {
         return subTasks;
     }
@@ -65,7 +57,7 @@ public class EpicTask extends Task {
                 ", taskStatus=" + getTaskStatus() +
                 ", taskName=" + getTaskName() +
                 ", taskDescription=" + getTaskDescription() +
-                ", subTasks=" + subTasks +
+                ", subTasks=" + getSubTasks() +
                 '}';
     }
 }

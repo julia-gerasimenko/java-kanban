@@ -1,14 +1,12 @@
-package model;
+package service;
 
 public class ToCreate {
     private String taskName;
     private String taskDescription;
-    private Type taskType;
 
-    public ToCreate(String taskName, String taskDescription, Type taskType) {
+    public ToCreate(String taskName, String taskDescription) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
-        this.taskType = taskType;
     }
 
     public String getTaskName() {
@@ -18,6 +16,4 @@ public class ToCreate {
     public String getTaskDescription() {
         return taskDescription;
     }
-
-    public Type getTaskType() { return taskType; }
 }

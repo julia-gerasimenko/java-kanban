@@ -1,22 +1,17 @@
 package model;
 
 public class SubTask extends Task{
-    private TaskStatus taskStatus; // "NEW" / "IN_PROGRESS" / "DONE"
-    private EpicTask epicTask;
+    private TaskStatus taskStatus;
     private Type taskType;
 
-    public SubTask(String taskName, int taskId, String taskDescription, TaskStatus taskStatus, EpicTask epicTask,
-                   Type taskType) {
+    public SubTask(String taskName, int taskId, String taskDescription, TaskStatus taskStatus, Type taskType) {
         super(taskName, taskId, taskDescription);
         this.taskStatus = taskStatus;
-        this.epicTask = epicTask;
         this.taskType = taskType;
     }
 
-    // почему singleTask, если у нас subtask
-    @Override
-    public SingleTask withTaskStatus(TaskStatus taskStatus) {
-        return new SingleTask(
+    public SubTask withNewTaskStatus(TaskStatus taskStatus) {
+        return new SubTask(
                 this.getTaskName(),
                 this.getTaskId(),
                 this.getTaskDescription(),
@@ -36,10 +31,9 @@ public class SubTask extends Task{
     public String toString() {
         return "SubTask{" +
                 "id=" + getTaskId() +
-                ", taskStatus=" + taskStatus +
+                ", taskStatus=" + getTaskStatus() +
                 ", taskName=" + getTaskName() +
                 ", taskDescription=" + getTaskDescription() +
-                ", epicTask=" + epicTask +
                 '}';
     }
 }
