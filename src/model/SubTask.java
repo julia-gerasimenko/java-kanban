@@ -2,12 +2,10 @@ package model;
 
 public class SubTask extends Task{
     private TaskStatus taskStatus;
-    private Type taskType;
 
-    public SubTask(String taskName, int taskId, String taskDescription, TaskStatus taskStatus, Type taskType) {
+    public SubTask(String taskName, int taskId, String taskDescription, TaskStatus taskStatus) {
         super(taskName, taskId, taskDescription);
         this.taskStatus = taskStatus;
-        this.taskType = taskType;
     }
 
     public SubTask withNewTaskStatus(TaskStatus taskStatus) {
@@ -15,8 +13,8 @@ public class SubTask extends Task{
                 this.getTaskName(),
                 this.getTaskId(),
                 this.getTaskDescription(),
-                taskStatus,
-                this.getType());
+                taskStatus
+        );
     }
 
     @Override

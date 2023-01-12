@@ -11,19 +11,20 @@ public class Main {
         // сохраняем новую задачу
         taskManager.saveSingleTask(toCreateSingle);
         // получение задачи по идентификатору
-        System.out.println(taskManager.getTaskById(0));
+        System.out.println("Новая SingleTask успешно создана: \r\n" + taskManager.getTaskById(0));
 
         // меняем статус сингл таск и выводим на печать
         // тут не поянятно в скобках (SingleTask) - разобраться
         SingleTask singleTask = (SingleTask) taskManager.getTaskById(0);
         taskManager.update(singleTask.withNewTaskStatus(TaskStatus.IN_PROGRESS));
-        System.out.println(taskManager.getTaskById(0));
+        System.out.println("Статус SingleTask услпешно обновлен: \r\n"
+                + taskManager.getTaskById(0));
 
         // создаем и сохраняем эпик
         ToCreate toCreateEpic = new ToCreate("BIG Epic task", "Step by step"); // 1
         taskManager.saveEpicTask(toCreateEpic);
         // выводим на печать эпик таск с пока что пустым массивом и статусом
-        System.out.println(taskManager.getTaskById(1));
+        System.out.println("Новая пустая EpicTask успешно создана: \r\n" + taskManager.getTaskById(1));
 
         // создаем и сохраняем две подзадачи в ArrayList Эпика id 1
         EpicTask epicTask = (EpicTask) taskManager.getTaskById(1);
@@ -32,47 +33,54 @@ public class Main {
         ToCreate toCreateSubTwo = new ToCreate("BIG Epic's subTask 2", "The second Step");
         taskManager.saveSubTask(toCreateSubTwo, epicTask); // 1003
 
-        // выводим на печать 1002 и 1003 SubTask
-        System.out.println(taskManager.getTaskById(1002));
-        System.out.println(taskManager.getTaskById(1003));
+        // выводим на печать 2 и 3 SubTask
+        System.out.println("1я подзадача Эпика 1 успешно создана: \r\n" + taskManager.getTaskById(2));
+        System.out.println("2я подзадача Эпика 1 успешно создана: \r\n" + taskManager.getTaskById(3));
 
         // меняем статус SubTask 1002 НА IN_PROGRESS и печатаем
-        SubTask subTask = (SubTask) taskManager.getTaskById(1002);
+        SubTask subTask = (SubTask) taskManager.getTaskById(2);
         taskManager.update(subTask.withNewTaskStatus(TaskStatus.IN_PROGRESS));
-        System.out.println(taskManager.getTaskById(1002));
+        System.out.println("Статус 1й подзадачи Эпика 1 услпешно обновлен: \r\n"
+                + taskManager.getTaskById(2));
         // выводим на печать конкретный эпик таск с подзадачами с ИЗМЕНЕННЫМ СТАТУСОМ
-        System.out.println(taskManager.getTaskById(1));
+        System.out.println("Статус Эпика 1 успешно обновлен: \r\n" + taskManager.getTaskById(1));
 
         // получение списка всех задач всех типов
-        System.out.println(taskManager.getAllTasks());
+        System.out.println("Список всех задач: " + taskManager.getAllTasks());
 
         // Получение списка задач по типам: простые, эпики
         // ??? Подзадачи нет смысла выводить отдельным общим списком отдельно от эпиков???
-        System.out.println(taskManager.filterTasksByType(Type.SINGLE));
-        System.out.println(taskManager.filterTasksByType(Type.EPIC));
+        System.out.println("Список всех задач типа Single: " + taskManager.filterTasksByType(Type.SINGLE));
+        System.out.println("Список всех задач типа Epic: " + taskManager.filterTasksByType(Type.EPIC));
 
         // получение списка всех подзадач определенного эпика
-        System.out.println(taskManager.getEpicSubTasks(1));
+        System.out.println("Список всех подзадач Эпика 1: " + taskManager.getEpicSubTasks(1));
 
         // удаление задачи по идентификатору и проверка
-        taskManager.deleteTaskById(0);
-        System.out.println(taskManager.filterTasksByType(Type.SINGLE).isEmpty());
+        taskManager.deleteTaskById(3);
+        System.out.println("Список всех подзадач Эпика 1 после удаления подзадачи 3: "
+                + taskManager.getEpicSubTasks(1));
 
+        // создаем и сохраняем еще одну SingleTask
+        ToCreate toCreateSingleTwo = new ToCreate("Simple task", "Just do it"); // 4
+        // сохраняем новую задачу
+        taskManager.saveSingleTask(toCreateSingleTwo);
+        // получение задачи по идентификатору
+        System.out.println("Новая SingleTask успешно создана: \r\n" + taskManager.getTaskById(4));
 
         // удаление всех задач по типам: простые, эпики
-        // удаляем созданную single task
-        ToCreate toCreateSingleTwo = new ToCreate("Second Simple task", "Just do it again");//4
-        taskManager.saveSingleTask(toCreateSingleTwo);
-        System.out.println(taskManager.filterTasksByType(Type.SINGLE));
+        // удаляем для примера single task
         taskManager.deleteTaskByType(Type.SINGLE);
-        System.out.println(taskManager.filterTasksByType(Type.SINGLE));
+        System.out.println("удаление всех задач по типу SINGLE успешно произведено: "
+                + taskManager.filterTasksByType(Type.SINGLE).isEmpty());
 
         // удаление всех подзадач определенного эпика
-        taskManager.deleteTaskForEpicId(1);
-        System.out.println(taskManager.filterTasksByType(Type.EPIC));
+        taskManager.deleteSubTasksForEpic(1);
+        System.out.println("удаление всех подзадач эпика 1 успешно произведено: "
+                + ((EpicTask) taskManager.getTaskById(1)).getSubTasks().isEmpty());
 
         // удаление всех задач
         taskManager.deleteAllTasks();
-        System.out.println(taskManager.getAllTasks());
+        System.out.println("удаление всех задач успешно произведено: " + taskManager.getAllTasks().isEmpty());
     }
 }

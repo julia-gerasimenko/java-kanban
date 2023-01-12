@@ -5,14 +5,12 @@ import java.util.ArrayList;
 public class EpicTask extends Task {
     private ArrayList<SubTask> subTasks;
     private TaskStatus taskStatus;
-    private Type taskType;
 
     public EpicTask(String taskName, int taskId, String taskDescription, ArrayList<SubTask> subTasks,
-                    TaskStatus taskStatus, Type taskType) {
+                    TaskStatus taskStatus) {
         super(taskName, taskId, taskDescription);
         this.subTasks = subTasks;
         this.taskStatus = taskStatus;
-        this.taskType = taskType;
     }
 
     @Override
@@ -56,8 +54,8 @@ public class EpicTask extends Task {
                 "id=" + getTaskId() +
                 ", taskStatus=" + getTaskStatus() +
                 ", taskName=" + getTaskName() +
-                ", taskDescription=" + getTaskDescription() +
-                ", subTasks=" + getSubTasks() +
+                ", taskDescription=" + getTaskDescription() + ",\r\n" +
+                "subTasks=" + getSubTasks() +
                 '}';
     }
 }
