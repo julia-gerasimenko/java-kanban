@@ -1,37 +1,37 @@
 import model.*;
 import service.TaskManager;
-import service.ToCreate;
+import service.TaskCreateDto;
 
 public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = new TaskManager();
 
         // создаем новую задачу
-        ToCreate toCreateSingle = new ToCreate("Simple task", "Just do it"); // 0
+        TaskCreateDto taskCreateDtoSingle = new TaskCreateDto("Simple task", "Just do it"); // 0
         // сохраняем новую задачу
-        taskManager.saveSingleTask(toCreateSingle);
+        taskManager.saveSingleTask(taskCreateDtoSingle);
         // получение задачи по идентификатору
         System.out.println("Новая SingleTask успешно создана: \r\n" + taskManager.getTaskById(0));
 
         // меняем статус сингл таск и выводим на печать
         // тут не поянятно в скобках (SingleTask) - разобраться
         SingleTask singleTask = (SingleTask) taskManager.getTaskById(0);
-        taskManager.update(singleTask.withNewTaskStatus(TaskStatus.IN_PROGRESS));
+        taskManager.update(singleTask.withNewStatus(Status.IN_PROGRESS));
         System.out.println("Статус SingleTask услпешно обновлен: \r\n"
                 + taskManager.getTaskById(0));
 
         // создаем и сохраняем эпик
-        ToCreate toCreateEpic = new ToCreate("BIG Epic task", "Step by step"); // 1
-        taskManager.saveEpicTask(toCreateEpic);
+        TaskCreateDto taskCreateDtoEpic = new TaskCreateDto("BIG Epic task", "Step by step"); // 1
+        taskManager.saveEpicTask(taskCreateDtoEpic);
         // выводим на печать эпик таск с пока что пустым массивом и статусом
         System.out.println("Новая пустая EpicTask успешно создана: \r\n" + taskManager.getTaskById(1));
 
         // создаем и сохраняем две подзадачи в ArrayList Эпика id 1
         EpicTask epicTask = (EpicTask) taskManager.getTaskById(1);
-        ToCreate toCreateSub = new ToCreate("BIG Epic's subTask 1", "The first Step");
-        taskManager.saveSubTask(toCreateSub, epicTask); // 1002
-        ToCreate toCreateSubTwo = new ToCreate("BIG Epic's subTask 2", "The second Step");
-        taskManager.saveSubTask(toCreateSubTwo, epicTask); // 1003
+        TaskCreateDto taskCreateDtoSub = new TaskCreateDto("BIG Epic's subTask 1", "The first Step");
+        taskManager.saveSubTask(taskCreateDtoSub, epicTask); // 1002
+        TaskCreateDto taskCreateDtoSubTwo = new TaskCreateDto("BIG Epic's subTask 2", "The second Step");
+        taskManager.saveSubTask(taskCreateDtoSubTwo, epicTask); // 1003
 
         // выводим на печать 2 и 3 SubTask
         System.out.println("1я подзадача Эпика 1 успешно создана: \r\n" + taskManager.getTaskById(2));
@@ -39,7 +39,7 @@ public class Main {
 
         // меняем статус SubTask 1002 НА IN_PROGRESS и печатаем
         SubTask subTask = (SubTask) taskManager.getTaskById(2);
-        taskManager.update(subTask.withNewTaskStatus(TaskStatus.IN_PROGRESS));
+        taskManager.update(subTask.withNewStatus(Status.IN_PROGRESS));
         System.out.println("Статус 1й подзадачи Эпика 1 услпешно обновлен: \r\n"
                 + taskManager.getTaskById(2));
         // выводим на печать конкретный эпик таск с подзадачами с ИЗМЕНЕННЫМ СТАТУСОМ
@@ -62,9 +62,9 @@ public class Main {
                 + taskManager.getEpicSubTasks(1));
 
         // создаем и сохраняем еще одну SingleTask
-        ToCreate toCreateSingleTwo = new ToCreate("Simple task", "Just do it"); // 4
+        TaskCreateDto taskCreateDtoSingleTwo = new TaskCreateDto("Simple task", "Just do it"); // 4
         // сохраняем новую задачу
-        taskManager.saveSingleTask(toCreateSingleTwo);
+        taskManager.saveSingleTask(taskCreateDtoSingleTwo);
         // получение задачи по идентификатору
         System.out.println("Новая SingleTask успешно создана: \r\n" + taskManager.getTaskById(4));
 

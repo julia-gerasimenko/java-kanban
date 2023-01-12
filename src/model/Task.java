@@ -1,29 +1,27 @@
 package model;
 
-import java.util.ArrayList;
-
 public abstract class Task {
-    private String taskName;
-    private int taskId;
-    private String taskDescription;
+    private String name;
+    private int id;
+    private String description;
 
-    public Task (String taskName, int taskId, String taskDescription) {
-        this.taskName = taskName;
-        this.taskId = taskId;
-        this.taskDescription = taskDescription;
+    public Task (String name, int id, String description) {
+        this.name = name;
+        this.id = id;
+        this.description = description;
     }
     // повторить про геттеры и сеттеры
-    public String getTaskName() {
-        return taskName;
+    public String getName() {
+        return name;
     }
 
-    public String getTaskDescription() { return taskDescription; }
+    public String getDescription() { return description; }
 
-    public int getTaskId() {
-        return taskId;
+    public int getId() {
+        return id;
     }
 
-    public abstract TaskStatus getTaskStatus ();
+    public abstract Status getStatus();
 
     public abstract Type getType();
 

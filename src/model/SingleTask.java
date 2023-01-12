@@ -1,25 +1,25 @@
 package model;
 
 public class SingleTask extends Task {
-    private TaskStatus taskStatus;
+    private Status status;
 
-    public SingleTask(String taskName, int taskId, String taskDescription, TaskStatus taskStatus) {
-        super(taskName, taskId, taskDescription);
-        this.taskStatus = taskStatus;
+    public SingleTask(String name, int id, String description, Status status) {
+        super(name, id, description);
+        this.status = status;
     }
 
-    public SingleTask withNewTaskStatus(TaskStatus taskStatus) {
+    public SingleTask withNewStatus(Status status) {
         return new SingleTask(
-                this.getTaskName(),
-                this.getTaskId(),
-                this.getTaskDescription(),
-                taskStatus
+                this.getName(),
+                this.getId(),
+                this.getDescription(),
+                status
         );
     }
 
     @Override
-    public TaskStatus getTaskStatus() {
-        return taskStatus;
+    public Status getStatus() {
+        return status;
     }
 
     @Override
@@ -30,11 +30,11 @@ public class SingleTask extends Task {
     @Override
     public String toString() {
         return "SingleTask{" +
-                "id=" + getTaskId() +
-                ", taskStatus=" + getTaskStatus() +
-                ", taskName=" + getTaskName() +
+                "id=" + getId() +
+                ", taskStatus=" + getStatus() +
+                ", taskName=" + getName() +
                 ", taskType=" + getType() +
-                ", taskDescription=" + getTaskDescription() +
+                ", taskDescription=" + getDescription() +
                 '}';
     }
 }
