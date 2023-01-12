@@ -48,28 +48,28 @@ public class Main {
 
         // Получение списка задач по типам: простые, эпики
         // ??? Подзадачи нет смысла выводить отдельным общим списком отдельно от эпиков???
-        System.out.println(taskManager.TasksByType(Type.SINGLE));
-        System.out.println(taskManager.TasksByType(Type.EPIC));
+        System.out.println(taskManager.filterTasksByType(Type.SINGLE));
+        System.out.println(taskManager.filterTasksByType(Type.EPIC));
 
         // получение списка всех подзадач определенного эпика
-        System.out.println(taskManager.TasksForEpic(1));
+        System.out.println(taskManager.getEpicSubTasks(1));
 
         // удаление задачи по идентификатору и проверка
         taskManager.deleteTaskById(0);
-        System.out.println(taskManager.TasksByType(Type.SINGLE));
+        System.out.println(taskManager.filterTasksByType(Type.SINGLE).isEmpty());
 
 
         // удаление всех задач по типам: простые, эпики
         // удаляем созданную single task
         ToCreate toCreateSingleTwo = new ToCreate("Second Simple task", "Just do it again");//4
         taskManager.saveSingleTask(toCreateSingleTwo);
-        System.out.println(taskManager.TasksByType(Type.SINGLE));
+        System.out.println(taskManager.filterTasksByType(Type.SINGLE));
         taskManager.deleteTaskByType(Type.SINGLE);
-        System.out.println(taskManager.TasksByType(Type.SINGLE));
+        System.out.println(taskManager.filterTasksByType(Type.SINGLE));
 
         // удаление всех подзадач определенного эпика
         taskManager.deleteTaskForEpicId(1);
-        System.out.println(taskManager.TasksByType(Type.EPIC));
+        System.out.println(taskManager.filterTasksByType(Type.EPIC));
 
         // удаление всех задач
         taskManager.deleteAllTasks();
