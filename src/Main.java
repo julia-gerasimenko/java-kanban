@@ -3,8 +3,6 @@ import service.InMemoryTaskManager;
 import service.Managers;
 import service.TaskCreateDto;
 
-// остановилась на видео 23 минута
-
 public class Main {
     public static void main(String[] args) {
         InMemoryTaskManager inMemoryTaskManager = Managers.inMemoryTaskManager();
