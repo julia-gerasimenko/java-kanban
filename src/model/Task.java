@@ -10,7 +10,6 @@ public abstract class Task {
         this.id = id;
         this.description = description;
     }
-    // повторить про геттеры и сеттеры
     public String getName() {
         return name;
     }
