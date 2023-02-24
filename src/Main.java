@@ -3,9 +3,61 @@ import service.InMemoryTaskManager;
 import service.Managers;
 import service.TaskCreateDto;
 
+
 public class Main {
     public static void main(String[] args) {
         InMemoryTaskManager inMemoryTaskManager = Managers.inMemoryTaskManager();
+
+        // создаем и сохраняем 1-ю новую простую задачу
+        inMemoryTaskManager.saveSingleTask(new TaskCreateDto("Simple task", "Just do it")); //0
+
+        // ссоздаем и сохраняем 2-ю новую простую задачу
+        inMemoryTaskManager.saveSingleTask(new TaskCreateDto("Simple 2nd task", "Do it again")); //1
+
+        // ссоздаем и сохраняем 3-ю новую простую задачу
+        inMemoryTaskManager.saveSingleTask(new TaskCreateDto("Simple 3rd task", "Again and again")); //2
+
+        // создаем и сохраняем эпик с тремя подзадачами
+        inMemoryTaskManager.saveEpicTask(new TaskCreateDto("BIG Epic task", "Step by step")); //3
+
+        inMemoryTaskManager.saveSubTask(new TaskCreateDto("BIG Epic's subTask 1", "The first Step"),
+                (EpicTask) inMemoryTaskManager.getTaskById(3)); // 4
+        inMemoryTaskManager.saveSubTask(new TaskCreateDto("BIG Epic's subTask 2", "The second Step"),
+                (EpicTask) inMemoryTaskManager.getTaskById(3)); // 5
+        inMemoryTaskManager.saveSubTask(new TaskCreateDto("BIG Epic's subTask 3", "The third Step"),
+                (EpicTask) inMemoryTaskManager.getTaskById(3)); // 6
+
+        // создаем и сохраняем эпик без подзадач
+        inMemoryTaskManager.saveEpicTask(new TaskCreateDto("2nd BIG Epic task", "New steps")); //7
+
+        // запрашиваем задачи несколько раз в разном порядке
+        inMemoryTaskManager.getTaskById(1);
+        inMemoryTaskManager.getTaskById(7);
+        inMemoryTaskManager.getTaskById(3);
+        inMemoryTaskManager.getTaskById(5);
+        inMemoryTaskManager.getTaskById(2);
+        inMemoryTaskManager.getTaskById(0);
+        inMemoryTaskManager.getTaskById(7);
+        inMemoryTaskManager.getTaskById(5);
+
+        // выводим историю и убеждаемся, что в ней нет повторов
+        System.out.println("Ожидался размер 6, выводится размер: " + inMemoryTaskManager.getHistory().size());
+        System.out.println(inMemoryTaskManager.getHistory());
+
+        // удаляем задачу, которая есть в истории, и проверяем, что при печати она не будет выводиться
+        inMemoryTaskManager.deleteTaskById(1);
+        System.out.println("Ожидался размер 5, выводится размер: " + inMemoryTaskManager.getHistory().size());
+        System.out.println(inMemoryTaskManager.getHistory());
+
+        // удаляем эпик с тремя подзадачами и убеждаемся, что из истории удалился как сам эпик, так и все его подзадачи
+        inMemoryTaskManager.deleteTaskById(3);
+        System.out.println("Ожидался размер 3, выводится размер: " + inMemoryTaskManager.getHistory().size());
+        System.out.println(inMemoryTaskManager.getHistory());
+
+
+
+
+        /*
 
         // создаем новую задачу
         TaskCreateDto taskCreateDtoSingle = new TaskCreateDto("Simple task", "Just do it"); // 0
@@ -87,5 +139,7 @@ public class Main {
         System.out.println("удаление всех задач успешно произведено: " + inMemoryTaskManager.getAllTasks().isEmpty());
 
         //refactoring.guru
+
+         */
     }
 }

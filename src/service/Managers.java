@@ -2,8 +2,6 @@ package service;
 
 public abstract class Managers {
 
-    // пока не разобралась, если убираю статик, ругается main. Буду разбираться :)
-
     private static InMemoryHistoryManager IN_MEMORY_HISTORY_MANAGER;
     private static InMemoryTaskManager IN_MEMORY_TASK_MANAGER;
 
