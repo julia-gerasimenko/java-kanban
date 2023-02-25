@@ -18,6 +18,7 @@ public class InMemoryTaskManager implements TaskManager {
         this.taskById = new HashMap<>();
     }
 
+    @Override
     public List<Task> getHistory() {
         List<Task> historyTasks = new ArrayList<>();
         for (int id : historyManager.getHistoryIds()) {
@@ -103,7 +104,8 @@ public class InMemoryTaskManager implements TaskManager {
         return task;
     }
 
-    private Task findTaskById(int id) {
+    @Override
+    public Task findTaskById(int id) {
         if (taskById.containsKey(id)) {
             return taskById.get(id);
         }
@@ -173,7 +175,8 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.reset();
     }
 
-    private void removeTaskFromHistory(Task task) {
+    @Override
+    public void removeTaskFromHistory(Task task) {
         historyManager.removeTaskFromHistory(task.getId());
         if (Type.EPIC.equals(task.getType())) {
             EpicTask epicTask = (EpicTask) task;

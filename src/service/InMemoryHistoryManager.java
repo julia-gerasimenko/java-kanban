@@ -6,6 +6,11 @@ import java.util.*;
 
 final class InMemoryHistoryManager implements HistoryManager {
 
+    // делала по совету одного из наставников Ивана Бутрим,
+    // он аргументировал логику хранения id вместо task, мне понравилось
+    // вижу, что тогда в данном случае движения с HashMap по сути становятся излишними
+    // но я выполнила все, что в задаче, чтобы показать, что смысл я поняла
+
     private CustomLinkedList<Integer> historyTaskIds = new CustomLinkedList<>();
     final private HashMap<Integer, Node<Integer>> historyMap = new HashMap<>();
 
@@ -28,7 +33,8 @@ final class InMemoryHistoryManager implements HistoryManager {
     @Override
     public List<Integer> getHistoryIds() {
         List<Integer> historyIds = new ArrayList<>(historyTaskIds.getTasks());
-        Collections.reverse(historyIds); // для того, чтобы самые новые выводились первыми
+        Collections.reverse(historyIds); // здесь у меня изначально был итератор по списку с конца,
+        // но потом я узнала про эту функцию, она показалась короче и более читабельна
         return historyIds;
     }
 
@@ -53,18 +59,17 @@ final class InMemoryHistoryManager implements HistoryManager {
     private static class CustomLinkedList<T> {
         private Node<T> head;
         private Node<T> tail;
-        private int size = 0;
 
         public void linkLast(T element) { // добавляем элемент в хвост списка
             final Node<T> newNode = new Node<>(tail, element, null);
 
-            if (size == 0) {
+            if (tail == null) {
                 head = newNode;
             } else {
                 tail.next = newNode;
             }
             tail = newNode;
-            size++;
+
         }
 
         public List<T> getTasks() { // собираем все задачи в список
@@ -93,7 +98,7 @@ final class InMemoryHistoryManager implements HistoryManager {
             } else {
                 nextNode.prev = previousNode;
             }
-            size--;
+
         }
 
 

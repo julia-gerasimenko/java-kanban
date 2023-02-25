@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {
+    List<Task> getHistory();
+
     void saveSingleTask(TaskCreateDto taskCreateDto);
 
     void saveEpicTask(TaskCreateDto taskCreateDto);
@@ -23,6 +25,8 @@ public interface TaskManager {
 
     Task getTaskById(int id);
 
+    Task findTaskById(int id);
+
     void deleteTaskById(int id);
 
     void deleteTaskByType(Type type);
@@ -31,6 +35,9 @@ public interface TaskManager {
 
     void deleteAllTasks();
 
+    void removeTaskFromHistory(Task task);
+
     void update(Task task);
+
 
 }
