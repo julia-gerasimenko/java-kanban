@@ -8,7 +8,12 @@ public interface HistoryManager {
 
     void addTaskToHistory(Task task);
 
-    // так рекомендовал наставник из 2 когорты на вебинаре, и аргументировал, мне понравилась его идея
+    void removeTaskFromHistory(int id);
+
     List<Integer> getHistoryIds();
 
+    void reset();
 }
+
+
+
