@@ -1,4 +1,4 @@
-package model;
+package org.yandex.kanban.model;
 
 public abstract class Task {
     private String name;

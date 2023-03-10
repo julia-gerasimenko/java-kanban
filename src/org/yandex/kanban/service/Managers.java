@@ -1,4 +1,4 @@
-package service;
+package org.yandex.kanban.service;
 
 public abstract class Managers {
 

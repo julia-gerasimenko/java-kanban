@@ -1,16 +1,15 @@
-package service;
+package org.yandex.kanban.service;
 
-import model.*;
+import org.yandex.kanban.model.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
     private final IdGenerator idGenerator;
-    private final HashMap<Integer, Task> taskById;
-    private final HistoryManager historyManager;
+    final HashMap<Integer, Task> taskById;
+    static HistoryManager historyManager;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
@@ -24,8 +23,9 @@ public class InMemoryTaskManager implements TaskManager {
         for (int id : historyManager.getHistoryIds()) {
             historyTasks.add(findTaskById(id));
         }
-        return Collections.unmodifiableList(historyTasks);
+        return historyTasks;
     }
+
 
     @Override
     public void saveSingleTask(TaskCreateDto taskCreateDto) {
@@ -56,7 +56,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void saveSubTask(TaskCreateDto taskCreateDto, EpicTask epicTask) {
         int nextFreeId = idGenerator.getNextFreeId();
-        ArrayList<SubTask> updatedSubTasks = epicTask.getSubTasks();
+        List<SubTask> updatedSubTasks = epicTask.getSubTasks();
         SubTask subTask = new SubTask(
                 taskCreateDto.getName(),
                 nextFreeId,
@@ -208,11 +208,32 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    public static final class IdGenerator {
-        public int nextFreeId = 0;
+    public final class IdGenerator {
 
         public int getNextFreeId() {
-            return nextFreeId++;
+            if (taskById.isEmpty()) {
+                return 0;
+            }
+
+            int maxId = 0;
+
+            for (Integer id : taskById.keySet()) {
+                if (id > maxId) {
+                    maxId = id;
+                }
+            }
+
+            for (int id : taskById.keySet()) {
+                if (Type.EPIC.equals(taskById.get(id).getType())) {
+                    List<SubTask> subTasks = getEpicSubTasks(id);
+                    for (SubTask task : subTasks) {
+                        if (task.getId() > maxId) {
+                            maxId = task.getId();
+                        }
+                    }
+                }
+            }
+            return maxId + 1;
         }
     }
 }

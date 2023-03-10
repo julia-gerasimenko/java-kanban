@@ -1,9 +1,9 @@
-package service;
+package org.yandex.kanban.service;
 
-import model.EpicTask;
-import model.SubTask;
-import model.Task;
-import model.Type;
+import org.yandex.kanban.model.EpicTask;
+import org.yandex.kanban.model.SubTask;
+import org.yandex.kanban.model.Task;
+import org.yandex.kanban.model.Type;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,58 +1,56 @@
-import model.*;
-import service.InMemoryTaskManager;
-import service.Managers;
-import service.TaskCreateDto;
-import service.TaskManager;
+import org.yandex.kanban.model.*;
+import org.yandex.kanban.service.Managers;
+import org.yandex.kanban.service.TaskCreateDto;
+import org.yandex.kanban.service.TaskManager;
+
+import java.io.IOException;
 
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         TaskManager taskManager = Managers.taskManager();
 
         // создаем и сохраняем 1-ю новую простую задачу
         taskManager.saveSingleTask(new TaskCreateDto("Simple task", "Just do it")); //0
 
-        // ссоздаем и сохраняем 2-ю новую простую задачу
+        // создаем и сохраняем 2-ю новую простую задачу
         taskManager.saveSingleTask(new TaskCreateDto("Simple 2nd task", "Do it again")); //1
 
-        // ссоздаем и сохраняем 3-ю новую простую задачу
+        // создаем и сохраняем 3-ю новую простую задачу
         taskManager.saveSingleTask(new TaskCreateDto("Simple 3rd task", "Again and again")); //2
 
         // создаем и сохраняем эпик с тремя подзадачами
         taskManager.saveEpicTask(new TaskCreateDto("BIG Epic task", "Step by step")); //3
 
         taskManager.saveSubTask(new TaskCreateDto("BIG Epic's subTask 1", "The first Step"),
-                (EpicTask) taskManager.getTaskById(3)); // 4
+                (EpicTask) taskManager.findTaskById(3)); // 4
         taskManager.saveSubTask(new TaskCreateDto("BIG Epic's subTask 2", "The second Step"),
-                (EpicTask) taskManager.getTaskById(3)); // 5
+                (EpicTask) taskManager.findTaskById(3)); // 5
         taskManager.saveSubTask(new TaskCreateDto("BIG Epic's subTask 3", "The third Step"),
-                (EpicTask) taskManager.getTaskById(3)); // 6
+                (EpicTask) taskManager.findTaskById(3)); // 6
 
         // создаем и сохраняем эпик без подзадач
         taskManager.saveEpicTask(new TaskCreateDto("2nd BIG Epic task", "New steps")); //7
 
         // запрашиваем задачи несколько раз в разном порядке
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(7);
-        taskManager.getTaskById(3);
-        taskManager.getTaskById(5);
-        taskManager.getTaskById(2);
         taskManager.getTaskById(0);
-        taskManager.getTaskById(7);
-        taskManager.getTaskById(5);
+        taskManager.getTaskById(1);
 
-        // выводим историю и убеждаемся, что в ней нет повторов
-        System.out.println("Ожидался размер 6, выводится размер: " + taskManager.getHistory().size());
+
+
+
+       // выводим историю и убеждаемся, что в ней нет повторов
+        System.out.println("Ожидался размер 2, выводится размер: " + taskManager.getHistory().size());
         System.out.println(taskManager.getHistory());
 
         // удаляем задачу, которая есть в истории, и проверяем, что при печати она не будет выводиться
-        taskManager.deleteTaskById(1);
-        System.out.println("Ожидался размер 5, выводится размер: " + taskManager.getHistory().size());
+        taskManager.deleteTaskById(0);
+        System.out.println("Ожидался размер 1, выводится размер: " + taskManager.getHistory().size());
         System.out.println(taskManager.getHistory());
 
         // удаляем эпик с тремя подзадачами и убеждаемся, что из истории удалился как сам эпик, так и все его подзадачи
         taskManager.deleteTaskById(3);
-        System.out.println("Ожидался размер 3, выводится размер: " + taskManager.getHistory().size());
+        System.out.println("Ожидался размер 1, выводится размер: " + taskManager.getHistory().size());
         System.out.println(taskManager.getHistory());
 
 

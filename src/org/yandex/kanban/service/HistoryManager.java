@@ -1,6 +1,6 @@
-package service;
+package org.yandex.kanban.service;
 
-import model.Task;
+import org.yandex.kanban.model.Task;
 
 import java.util.List;
 

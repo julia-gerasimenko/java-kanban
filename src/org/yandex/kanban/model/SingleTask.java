@@ -1,4 +1,4 @@
-package model;
+package org.yandex.kanban.model;
 
 public class SingleTask extends Task {
     private Status status;

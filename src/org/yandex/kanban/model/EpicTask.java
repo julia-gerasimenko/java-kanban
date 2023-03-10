@@ -1,15 +1,16 @@
-package model;
+package org.yandex.kanban.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EpicTask extends Task {
-    private ArrayList<SubTask> subTasks;
+    private List<SubTask> subTasks;
     private Status status;
 
-    public EpicTask(String name, int id, String description, ArrayList<SubTask> subTasks,
+    public EpicTask(String name, int id, String description, List<SubTask> subTasks,
                     Status status) {
         super(name, id, description);
-        this.subTasks = subTasks;
+        this.subTasks = subTasks == null ? new ArrayList<>() : subTasks;
         this.status = status;
     }
 
@@ -23,7 +24,8 @@ public class EpicTask extends Task {
                 statusQuantity++;
                 if (statusQuantity == subTasks.size()) {
                     status = Status.NEW;
-                };
+                }
+                ;
             } else if (subTask.getStatus().equals(Status.DONE)) {
                 statusQuantity++;
                 if (statusQuantity == subTasks.size()) {
@@ -35,16 +37,17 @@ public class EpicTask extends Task {
         }
         return status;
     }
-    public ArrayList<SubTask> getSubTasks() {
+
+    public List<SubTask> getSubTasks() {
         return subTasks;
     }
 
-    public void setSubTasks(ArrayList<SubTask> subTasks) {
+    public void setSubTasks(List<SubTask> subTasks) {
         this.subTasks = subTasks;
     }
 
     @Override
-    public Type getType () {
+    public Type getType() {
         return Type.EPIC;
     }
 
