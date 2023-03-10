@@ -93,6 +93,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                         subTask.getName(), subTask.getStatus(), subTask.getDescription(), epicTask.getId());
                 tasksToLine.append(subTaskToString).append("\n");
             }
+
             return String.valueOf(tasksToLine);
         } else {
             return String.format("%d,%s,%s,%s,%s,", task.getId(), task.getType(),
@@ -102,8 +103,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public Map.Entry<Task, Integer> fromString(String value) { // метод восстановления задачи из строки
         String[] list = value.split(",");
+        String taskType = list[1];
 
-        switch (list[1]) {
+        switch (taskType) {
             case "SINGLE":
                 return Map.entry(new SingleTask(list[2], Integer.parseInt(list[0]), list[4], Status.valueOf(list[3])),
                         -1);
@@ -133,10 +135,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     static List<Integer> historyFromString(String value) { // метод восстановления истории из строки
-        String[] list = value.split(",");
+        String[] historyToList = value.split(",");
         List<Integer> historyTaskIds = new LinkedList<>();
 
-        for (String s : list) {
+        for (String s : historyToList) {
             historyTaskIds.add(Integer.parseInt(s));
         }
         return historyTaskIds;
