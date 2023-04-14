@@ -4,7 +4,7 @@ import org.yandex.kanban.model.Task;
 
 import java.util.*;
 
-final class InMemoryHistoryManager implements HistoryManager {
+public class InMemoryHistoryManager implements HistoryManager {
 
     // делала по совету одного из наставников Ивана Бутрим,
     // он аргументировал логику хранения id вместо task, мне понравилось
@@ -12,7 +12,7 @@ final class InMemoryHistoryManager implements HistoryManager {
     // но я выполнила все, что в задаче, чтобы показать, что смысл я поняла
 
      CustomLinkedList<Integer> historyTaskIds = new CustomLinkedList<>();
-    final private HashMap<Integer, Node<Integer>> historyMap = new HashMap<>();
+    private final HashMap<Integer, Node<Integer>> historyMap = new HashMap<>();
 
     @Override
     public void addTaskToHistory(Task task) {

@@ -1,40 +1,32 @@
-import org.yandex.kanban.model.*;
-import org.yandex.kanban.service.*;
+package org.yandex.kanban;
 
-import java.io.IOException;
+import org.yandex.kanban.service.FileBackedTasksManager;
+import org.yandex.kanban.service.HistoryManager;
+import org.yandex.kanban.service.InMemoryHistoryManager;
+import org.yandex.kanban.service.TaskCreateDto;
+
+import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.yandex.kanban.service.FileBackedTasksManager.loadFromFile;
 
 
 public class Main {
     public static void main(String[] args) {
 
-        // спасибо, вроде сделала как надо, по крайней мере, работает хорошо :)
-        TaskManager taskManager = Managers.taskManager();
+        HistoryManager historyManagerTwo = new InMemoryHistoryManager();
+        Path path = Path.of("src/resources/org/yandex/kanban/taskManagerStorage.csv");
+        FileBackedTasksManager taskManagerTwo = new FileBackedTasksManager
+                (historyManagerTwo, path);
+        taskManagerTwo.saveEpicTask(new TaskCreateDto("Test Epic task", "Testing epic")); // id = 0
+        assertFalse(taskManagerTwo.getAllTasks().isEmpty(), "Список задач пустой");
+        taskManagerTwo.save();
+        FileBackedTasksManager taskManagerThree = loadFromFile(path);
+        System.out.println(taskManagerThree.getAllTasks());
 
-        taskManager.saveSingleTask(new TaskCreateDto("Simple task", "Just do it")); //0
-        taskManager.saveSingleTask(new TaskCreateDto("Simple 2nd task", "Do it again")); //1
-        taskManager.saveSingleTask(new TaskCreateDto("Simple 3rd task", "Again"));//2
-        taskManager.saveEpicTask(new TaskCreateDto("BIG Epic task", "Step by step")); //3
-        taskManager.saveSubTask(new TaskCreateDto("BIG Epic's subTask 1", "The first Step"),
-                (EpicTask) taskManager.findTaskById(3)); // 4
-        taskManager.saveSubTask(new TaskCreateDto("BIG Epic's subTask 2", "The second Step"),
-                (EpicTask) taskManager.findTaskById(3)); // 5
-        taskManager.saveSubTask(new TaskCreateDto("BIG Epic's subTask 3", "The third Step"),
-                (EpicTask) taskManager.findTaskById(3)); // 6
-
-        // запрашиваем задачи
-        taskManager.getTaskById(0);
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(2);
-        taskManager.getTaskById(3);
-        taskManager.getTaskById(4);
-        taskManager.getTaskById(5);
-        taskManager.getTaskById(6);
-
-        TaskManager taskManagerTwo = Managers.taskManager();
-
-        System.out.println(taskManagerTwo.getAllTasks());
-        System.out.println(taskManagerTwo.getHistory());
-
+        //SingleTask singleTaskTwo = new SingleTask("Corrected single",5, "Testing correction",
+               // Status.IN_PROGRESS);
+        //taskManager.update(singleTaskTwo);
 
         /*
 

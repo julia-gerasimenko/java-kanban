@@ -3,8 +3,11 @@ package org.yandex.kanban.service;
 import org.yandex.kanban.model.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import static org.yandex.kanban.model.Type.EPIC;
 
 public class InMemoryTaskManager implements TaskManager {
     private final IdGenerator idGenerator;
@@ -12,7 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
     static HistoryManager historyManager;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
-        this.historyManager = historyManager;
+        InMemoryTaskManager.historyManager = historyManager;
         this.idGenerator = new IdGenerator();
         this.taskById = new HashMap<>();
     }
@@ -34,8 +37,9 @@ public class InMemoryTaskManager implements TaskManager {
                 taskCreateDto.getName(),
                 nextFreeId,
                 taskCreateDto.getDescription(),
-                Status.NEW
-        );
+                Status.NEW,
+                taskCreateDto.getStartTime(),
+                taskCreateDto.getDurationInMins());
         taskById.put(singleTask.getId(), singleTask);
     }
 
@@ -48,7 +52,7 @@ public class InMemoryTaskManager implements TaskManager {
                 nextFreeId,
                 taskCreateDto.getDescription(),
                 subTasks,
-                null
+                Status.NEW
         );
         taskById.put(epicTask.getId(), epicTask);
     }
@@ -61,8 +65,9 @@ public class InMemoryTaskManager implements TaskManager {
                 taskCreateDto.getName(),
                 nextFreeId,
                 taskCreateDto.getDescription(),
-                Status.NEW
-        );
+                Status.NEW,
+                taskCreateDto.getStartTime(),
+                taskCreateDto.getDurationInMins());
         updatedSubTasks.add(subTask);
         epicTask.setSubTasks(updatedSubTasks);
         epicTask.getStatus();
@@ -74,12 +79,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> filterTasksByType(Type type) {
-        ArrayList<Task> tasks = new ArrayList<>();
+    public List<Task> filterTasksByType(Type type) {
+        List<Task> tasks = new ArrayList<>();
         for (Task task : taskById.values()) {
             if (type.equals(task.getType())) {
                 tasks.add(task);
             }
+        }
+        if (tasks.isEmpty()) {
+            return Collections.emptyList();
         }
         return tasks;
     }
@@ -111,7 +119,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         for (Task task : taskById.values()) {
-            if (Type.EPIC.equals(task.getType())) {
+            if (EPIC.equals(task.getType())) {
                 EpicTask epicTask = (EpicTask) task;
                 for (SubTask subTask : epicTask.getSubTasks()) {
                     if (subTask.getId() == id) {
@@ -126,16 +134,17 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTaskById(int id) {
         if (taskById.containsKey(id)) {
-            removeTaskFromHistory(taskById.remove(id));
+            removeTaskFromHistory(taskById.get(id));
+            taskById.remove(id);
             return;
         }
         for (Task task : taskById.values()) {
-            if (Type.EPIC.equals(task.getType())) {
+            if (EPIC.equals(task.getType())) {
                 EpicTask epicTask = (EpicTask) task;
                 for (SubTask subTask : epicTask.getSubTasks()) {
                     if (subTask.getId() == id) {
-                        epicTask.getSubTasks().remove(subTask);
                         removeTaskFromHistory(subTask);
+                        epicTask.getSubTasks().remove(subTask);
                         epicTask.getStatus();
                         break;
                     }
@@ -146,11 +155,23 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTaskByType(Type type) {
-        for (Task task : new ArrayList<>(taskById.values())) {
-            if (type.equals(task.getType())) {
-                taskById.remove(task.getId());
-                removeTaskFromHistory(task);
-            }
+
+        switch (type) {
+            case SINGLE:
+            case EPIC:
+                for (int i = taskById.size()-1; i > -1; i--) {
+                    if (type.equals(taskById.get(i).getType())) {
+                        removeTaskFromHistory(taskById.get(i));
+                        taskById.remove(taskById.get(i).getId());
+                    }
+                }
+            case SUB: // если мы хотим удалить все сабтаски у всех эпиков
+                for (int i = 0; i < taskById.size(); i++) {
+                    if (EPIC.equals(taskById.get(i).getType())) {
+                        EpicTask epicTask = (EpicTask) taskById.get(i);
+                        epicTask.getSubTasks().clear();
+                    }
+                }
         }
     }
 
@@ -161,7 +182,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         Task task = taskById.get(epicId);
 
-        if (Type.EPIC.equals(task.getType())) {
+        if (EPIC.equals(task.getType())) {
             EpicTask epicTask = (EpicTask) task;
             epicTask.getSubTasks().forEach(this::removeTaskFromHistory);
             epicTask.getSubTasks().clear();
@@ -178,9 +199,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeTaskFromHistory(Task task) {
         historyManager.removeTaskFromHistory(task.getId());
-        if (Type.EPIC.equals(task.getType())) {
+        if (EPIC.equals(task.getType())) {
             EpicTask epicTask = (EpicTask) task;
-            epicTask.getSubTasks().forEach(this::removeTaskFromHistory);
+
+            if (epicTask.getSubTasks().isEmpty()) {
+                return;
+            }
+            for (int i = 0; i < epicTask.getSubTasks().size(); i++) {
+                historyManager.removeTaskFromHistory(epicTask.getSubTasks().get(i).getId());
+            }
         }
     }
 
@@ -191,16 +218,17 @@ public class InMemoryTaskManager implements TaskManager {
             taskById.put(task.getId(), task);
         }
         for (Task epicTaskToFind : taskById.values()) {
-            if (!Type.EPIC.equals(task.getType())) {
+            if (!EPIC.equals(epicTaskToFind.getType())) {
                 continue;
             }
             EpicTask epicTask = (EpicTask) epicTaskToFind;
-            for (SubTask subToFind : epicTask.getSubTasks()) {
+            List<SubTask> listOfSubTasks = epicTask.getSubTasks();
+            for (SubTask subToFind : listOfSubTasks) {
                 if (subToFind.getId() == task.getId()) {
                     int indexOfSub = epicTask.getSubTasks().indexOf(subToFind);
-                    epicTask.getSubTasks().remove(indexOfSub);
-                    epicTask.getSubTasks().add(indexOfSub, (SubTask) task);
-                    epicTask.setSubTasks(epicTask.getSubTasks());
+                    listOfSubTasks.remove(indexOfSub);
+                    listOfSubTasks.add(indexOfSub, (SubTask) task);
+                    epicTask.setSubTasks(listOfSubTasks);
                     epicTask.getStatus();
                     break;
                 }
@@ -224,7 +252,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
 
             for (int id : taskById.keySet()) {
-                if (Type.EPIC.equals(taskById.get(id).getType())) {
+                if (EPIC.equals(taskById.get(id).getType())) {
                     List<SubTask> subTasks = getEpicSubTasks(id);
                     for (SubTask task : subTasks) {
                         if (task.getId() > maxId) {
