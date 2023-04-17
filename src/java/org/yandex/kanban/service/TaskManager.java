@@ -7,8 +7,13 @@ import org.yandex.kanban.model.Type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public interface TaskManager {
+    TreeSet getPrioritizedTasks(); // проверила на сортировку по startTime
+    void deleteFromPrioritizedTasks(Task t);
+    void updatePrioritizedTasks(Task t);
+    boolean isOvelappedTask(Task t);
     List<Task> getHistory(); // проверила на совпадение сохраненной истории
 
     void saveSingleTask(TaskCreateDto taskCreateDto); // проверила, сохраняется ли, и что сохраняется

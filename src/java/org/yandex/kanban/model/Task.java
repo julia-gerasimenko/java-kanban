@@ -2,7 +2,7 @@ package org.yandex.kanban.model;
 
 import java.time.LocalDateTime;
 
-public abstract class Task {
+public abstract class Task  implements Overlappable {
     private final String name;
     private final int id;
     private final String description;

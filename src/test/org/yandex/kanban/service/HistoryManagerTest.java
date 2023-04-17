@@ -26,7 +26,7 @@ class HistoryManagerTest {
     @BeforeEach
     public void beforeEach() {
         historyManager = new InMemoryHistoryManager();
-        taskManager = new FileBackedTasksManager(historyManager, Path.of("src\\taskManagerStorage.csv"));
+        taskManager = new FileBackedTasksManager(historyManager, testFilePath);
 
         taskManager.saveSingleTask(new TaskCreateDto("Test Single task",
                 "Testing single")); // id = 0

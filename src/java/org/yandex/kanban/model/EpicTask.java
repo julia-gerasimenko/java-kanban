@@ -55,7 +55,7 @@ public class EpicTask extends Task {
         recalculateTimeProperties();
     }
     
-    private void recalculateTimeProperties(){
+    public void recalculateTimeProperties(){
         startTime = null;
         endTime = null;
         durationInMins = subTasks.stream()

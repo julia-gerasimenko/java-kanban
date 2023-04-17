@@ -1,9 +1,11 @@
 package org.yandex.kanban.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class SingleTask extends Task implements Overlappable{
+public class SingleTask extends Task{
     private final Status status;
     private final Long durationInMins;
     private final LocalDateTime startTime;

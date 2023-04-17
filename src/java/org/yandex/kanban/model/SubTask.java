@@ -3,7 +3,7 @@ package org.yandex.kanban.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class SubTask extends Task implements Overlappable{
+public class SubTask extends Task{
     private final Status status;
     private final LocalDateTime startTime;
     private final Long durationInMins;
