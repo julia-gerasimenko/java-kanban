@@ -75,7 +75,7 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
                 LocalDateTime.of(2023, Month.APRIL, 27, 0, 0, 0),
                 30L), (EpicTask) taskManager.findTaskById(1)); // id = 2
 
-        taskManager.deleteFromPrioritizedTasks(taskManager.getTaskById(2));
+        taskManager.deleteTaskById(2);
         String toCompareSingle = "[SingleTask{id=0, taskStatus=NEW, taskName=Single task, taskType=SINGLE, " +
                 "taskDescription=The first step}]";
         assertEquals(toCompareSingle, taskManager.getPrioritizedTasks().toString(),
@@ -112,8 +112,8 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
                 (EpicTask) taskManager.getTaskById(1)); // id = 3
 
         assertEquals(List.of("SingleTask{id=0, taskStatus=NEW, taskName=Test Single task, " +
-                        "taskType=SINGLE, taskDescription=Testing single}",
-                "SubTask{id=2, taskStatus=NEW, taskName=Test Sub task, taskDescription=Testing sub}").toString(),
+                                "taskType=SINGLE, taskDescription=Testing single}",
+                        "SubTask{id=2, taskStatus=NEW, taskName=Test Sub task, taskDescription=Testing sub}").toString(),
                 taskManager.getPrioritizedTasks().toString(),
                 "Пересекающиеся задачи сохраняются некорректно");
     }
@@ -336,8 +336,6 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
         taskManager.deleteTaskById(0);
         taskManager.deleteTaskById(10); // удаляем несуществующий id
         assertTrue(taskManager.getAllTasks().isEmpty(), "Некорректное удаление всех сохраненных задач");
-
-
     }
 
     @Test
@@ -437,7 +435,8 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
                 Status.IN_PROGRESS, null, null);
         EpicTask epicTask = new EpicTask("Corrected Epic", 1, "Testing correction", null,
                 Status.DONE);
-        SubTask subTask = new SubTask("corrected Sub", 2, "Testing correction", Status.IN_PROGRESS, null, null);
+        SubTask subTask = new SubTask("corrected Sub", 2, "Testing correction", Status.IN_PROGRESS,
+                null, null);
 
         taskManager.update(singleTask);
         assertEquals(singleTask, taskManager.getTaskById(0), "SingeTask не обновлена");

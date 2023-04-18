@@ -71,7 +71,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             String historyOrderLine = lines.get(lines.size() - 1);
 
             for (Integer id : historyFromString(historyOrderLine)) {
-                historyManager.addTaskToHistory(manager.findTaskById(id));
+                manager.historyManager.addTaskToHistory(manager.findTaskById(id));
             }
         }
 

@@ -3,7 +3,7 @@ package org.yandex.kanban.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class SubTask extends Task{
+public class SubTask extends Task {
     private final Status status;
     private final LocalDateTime startTime;
     private final Long durationInMins;
@@ -63,11 +63,22 @@ public class SubTask extends Task{
         if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
-        return this.getId() == ((SubTask) obj).getId()
-                && (Objects.equals(this.getName(), ((SubTask) obj).getName())
-                && Objects.equals(this.getDescription(), ((SubTask) obj).getDescription())
-                && this.getStatus() == ((SubTask) obj).getStatus()
-        );
+
+        if (this.getStartTime() == null && ((SubTask) obj).getStartTime() == null) {
+            return this.getId() == ((SubTask) obj).getId()
+                    && (Objects.equals(this.getName(), ((SubTask) obj).getName())
+                    && Objects.equals(this.getDescription(), ((SubTask) obj).getDescription())
+                    && this.getStatus() == ((SubTask) obj).getStatus());
+
+        } else {
+            return this.getId() == ((SubTask) obj).getId()
+                    && (Objects.equals(this.getName(), ((SubTask) obj).getName())
+                    && Objects.equals(this.getDescription(), ((SubTask) obj).getDescription())
+                    && this.getStatus() == ((SubTask) obj).getStatus()
+                    && this.getStartTime().equals(((SubTask) obj).getStartTime())
+                    && this.getDurationInMins().equals(((SubTask) obj).getDurationInMins())
+            );
+        }
     }
 
     @Override

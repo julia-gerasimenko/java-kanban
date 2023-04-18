@@ -36,7 +36,7 @@ class HistoryManagerTest {
     }
 
     @Test
-    public void shouldAddAllTypesOfTasksToHistoryOrThrowNullPointerExceptionWhenTaskDoesNotExist() {
+    public void shouldAddAllTypesOfTasksToHistory() {
         historyManager.addTaskToHistory(taskManager.findTaskById(1));
         historyManager.addTaskToHistory(taskManager.findTaskById(2));
         historyManager.addTaskToHistory(taskManager.findTaskById(0));
@@ -51,10 +51,9 @@ class HistoryManagerTest {
         assertEquals("[2, 0, 1]", historyManager.getHistoryIds().toString(),
                 "Неверные Id в истории после добавления дублирующего ID 2");
 
-        NullPointerException ex = Assertions.assertThrows(
-                NullPointerException.class,
-                () -> historyManager.addTaskToHistory(taskManager.findTaskById(10)));
-        assertNull(ex.getMessage());
+        historyManager.addTaskToHistory(taskManager.findTaskById(10));
+        assertEquals("[2, 0, 1]", historyManager.getHistoryIds().toString(),
+                "Неверные Id в истории после добавления несуществующего ID 10");
     }
 
     @Test

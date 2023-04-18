@@ -2,7 +2,10 @@ package org.yandex.kanban.service;
 
 import org.yandex.kanban.model.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
@@ -11,14 +14,16 @@ public class InMemoryHistoryManager implements HistoryManager {
     // вижу, что тогда в данном случае движения с HashMap по сути становятся излишними
     // но я выполнила все, что в задаче, чтобы показать, что смысл я поняла
 
-     CustomLinkedList<Integer> historyTaskIds = new CustomLinkedList<>();
+    CustomLinkedList<Integer> historyTaskIds = new CustomLinkedList<>();
     private final HashMap<Integer, Node<Integer>> historyMap = new HashMap<>();
 
     @Override
     public void addTaskToHistory(Task task) {
-        removeTaskFromHistory(task.getId());
-        historyTaskIds.linkLast(task.getId());
-        historyMap.put(task.getId(), historyTaskIds.tail);
+        if (task != null) {
+            removeTaskFromHistory(task.getId());
+            historyTaskIds.linkLast(task.getId());
+            historyMap.put(task.getId(), historyTaskIds.tail);
+        }
     }
 
     @Override

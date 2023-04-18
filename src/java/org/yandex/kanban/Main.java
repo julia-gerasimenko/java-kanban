@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.yandex.kanban.service.FileBackedTasksManager.loadFromFile;
 
-
 public class Main {
     public static void main(String[] args) {
 

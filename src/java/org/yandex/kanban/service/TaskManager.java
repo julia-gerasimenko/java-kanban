@@ -7,12 +7,10 @@ import org.yandex.kanban.model.Type;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Set;
 
 public interface TaskManager {
-    TreeSet getPrioritizedTasks(); // проверила на сортировку по startTime
-    void deleteFromPrioritizedTasks(Task t);
-    void updatePrioritizedTasks(Task t);
+    Set<Task> getPrioritizedTasks(); // проверила на сортировку по startTime
     boolean isOvelappedTask(Task t);
     List<Task> getHistory(); // проверила на совпадение сохраненной истории
 

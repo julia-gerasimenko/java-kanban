@@ -23,6 +23,5 @@ public abstract class Managers {
         } else taskManager = FileBackedTasksManager.loadFromFile(STORAGE_PATH);
         return taskManager;
     }
-
 }
 

@@ -40,6 +40,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<TaskManager> {
                 "Список задач после загрузки не пустой");
         assertEquals(taskManagerTwo.getAllTasks(), taskManagerThree.getAllTasks(),
                 "Список задач не совпадает после выгрузки из файла");
+        //здесь я не разобралась немного про AssertAll, спрошу у наставника
     }
 
     @Test

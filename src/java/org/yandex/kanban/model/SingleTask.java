@@ -1,11 +1,9 @@
 package org.yandex.kanban.model;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class SingleTask extends Task{
+public class SingleTask extends Task {
     private final Status status;
     private final Long durationInMins;
     private final LocalDateTime startTime;
@@ -66,12 +64,23 @@ public class SingleTask extends Task{
         if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
-        return this.getId() == ((SingleTask) obj).getId()
-                && (Objects.equals(this.getName(), ((SingleTask) obj).getName())
-                && Objects.equals(this.getDescription(), ((SingleTask) obj).getDescription())
-                && this.getStatus() == ((SingleTask) obj).getStatus()
-        );
+
+        if (this.getStartTime() == null && ((SingleTask) obj).getStartTime() == null) {
+            return this.getId() == ((SingleTask) obj).getId()
+                    && (Objects.equals(this.getName(), ((SingleTask) obj).getName())
+                    && Objects.equals(this.getDescription(), ((SingleTask) obj).getDescription())
+                    && this.getStatus() == ((SingleTask) obj).getStatus());
+        } else {
+            return this.getId() == ((SingleTask) obj).getId()
+                    && (Objects.equals(this.getName(), ((SingleTask) obj).getName())
+                    && Objects.equals(this.getDescription(), ((SingleTask) obj).getDescription())
+                    && this.getStatus() == ((SingleTask) obj).getStatus()
+                    && this.getStartTime().equals(((SingleTask) obj).getStartTime())
+                    && this.getDurationInMins().equals(((SingleTask) obj).getDurationInMins())
+            );
+        }
     }
+
 
     @Override
     public String toString() {

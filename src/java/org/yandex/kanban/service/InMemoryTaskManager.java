@@ -10,41 +10,27 @@ import static org.yandex.kanban.model.Type.SUB;
 public class InMemoryTaskManager implements TaskManager {
     private final IdGenerator idGenerator;
     final HashMap<Integer, Task> taskById;
-    static HistoryManager historyManager;
+    HistoryManager historyManager;
     TreeSet<Task> prioritizedTasks;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
-        InMemoryTaskManager.historyManager = historyManager;
+        this.historyManager = historyManager;
         this.idGenerator = new IdGenerator();
         this.taskById = new HashMap<>();
         this.prioritizedTasks = new TreeSet<>(new MyCustomComparator<Task>());
     }
 
     @Override
-    public TreeSet<Task> getPrioritizedTasks() {
+    public Set<Task> getPrioritizedTasks() {
         return prioritizedTasks;
     }
 
-    @Override
-    public void deleteFromPrioritizedTasks(Task t) {
-        List<Task> prioritizedTasksList = new ArrayList<>(prioritizedTasks);
-        if (prioritizedTasksList.contains(t)) {
-            prioritizedTasksList.remove(t);
-            prioritizedTasks.clear();
-            prioritizedTasks.addAll(prioritizedTasksList);
-        }
-    }
+    private void updatePrioritizedTasks(Task t) {
+        Task taskToUpdate = getTaskById(t.getId());
 
-    @Override
-    public void updatePrioritizedTasks(Task t) {
-        Task taskToUpdate = taskById.get(t.getId());
-        List<Task> prioritizedTasksList = new ArrayList<>(prioritizedTasks);
-
-        if (prioritizedTasksList.contains(taskToUpdate)) {
-            prioritizedTasksList.remove(taskToUpdate);
-            prioritizedTasksList.add(t);
-            prioritizedTasks.clear();
-            prioritizedTasks.addAll(prioritizedTasksList);
+        if (prioritizedTasks.contains(taskToUpdate)) {
+            prioritizedTasks.remove(taskToUpdate);
+            prioritizedTasks.add(t);
         }
     }
 
@@ -178,7 +164,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTaskById(int id) {
         if (taskById.containsKey(id)) {
-            deleteFromPrioritizedTasks(taskById.get(id));
+            prioritizedTasks.remove(taskById.get(id));
             removeTaskFromHistory(taskById.get(id));
             taskById.remove(id);
             return;
@@ -189,7 +175,7 @@ public class InMemoryTaskManager implements TaskManager {
                 for (SubTask subTask : epicTask.getSubTasks()) {
                     if (subTask.getId() == id) {
                         removeTaskFromHistory(subTask);
-                        deleteFromPrioritizedTasks(subTask);
+                        prioritizedTasks.remove(subTask);
                         epicTask.getSubTasks().remove(subTask);
                         epicTask.getStatus();
                         break;
@@ -208,7 +194,7 @@ public class InMemoryTaskManager implements TaskManager {
                 for (int i = taskById.size() - 1; i > -1; i--) {
                     if (type.equals(taskById.get(i).getType())) {
                         removeTaskFromHistory(taskById.get(i));
-                        deleteFromPrioritizedTasks(taskById.get(i));
+                        prioritizedTasks.remove(taskById.get(i));
                         taskById.remove(taskById.get(i).getId());
                     }
                 }
@@ -217,7 +203,7 @@ public class InMemoryTaskManager implements TaskManager {
                     if (EPIC.equals(taskById.get(i).getType())) {
                         EpicTask epicTask = (EpicTask) taskById.get(i);
                         epicTask.getSubTasks().forEach(this::removeTaskFromHistory);
-                        epicTask.getSubTasks().forEach(this::deleteFromPrioritizedTasks);
+                        epicTask.getSubTasks().forEach(subTask -> prioritizedTasks.remove(subTask));
                         epicTask.getSubTasks().clear();
                     }
                 }
@@ -234,7 +220,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (EPIC.equals(task.getType())) {
             EpicTask epicTask = (EpicTask) task;
             epicTask.getSubTasks().forEach(this::removeTaskFromHistory);
-            epicTask.getSubTasks().forEach(this::deleteFromPrioritizedTasks);
+            epicTask.getSubTasks().forEach(subTask -> prioritizedTasks.remove(subTask));
             epicTask.getSubTasks().clear();
             epicTask.getStatus();
         }
@@ -320,12 +306,22 @@ public class InMemoryTaskManager implements TaskManager {
 }
 
 class MyCustomComparator<T> implements Comparator<Task> {
+
     @Override
     public int compare(Task t1, Task t2) {
+        if (t1.getStartTime() == null && t2.getStartTime() == null && t1.getId() != t2.getId()) {
+            return 1;
+        }
+        if (t1.getStartTime() == null && t2.getStartTime() == null) {
+            return 0;
+        }
         if (t1.getStartTime() == null) {
             return 1;
-        } else {
-            return t1.getStartTime().compareTo(t2.getStartTime());
         }
+        if (t2.getStartTime() == null) {
+            return -1;
+        }
+        return t1.getStartTime().compareTo(t2.getStartTime());
     }
 }
+
