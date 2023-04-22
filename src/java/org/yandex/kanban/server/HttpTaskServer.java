@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.yandex.kanban.model.SingleTask;
 import org.yandex.kanban.model.Task;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -37,7 +37,7 @@ public class HttpTaskServer {
 
 
     private static final Gson GSON_CONVERTER = new GsonBuilder()
-            .registerTypeAdapter(LocalDateTime.class,new LocalDateTimeAdapter())
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
 
     private final TaskManager taskManager;
@@ -59,57 +59,22 @@ public class HttpTaskServer {
                 switch (subPath) {
                     case ROOT_SUBPATH:
                         if (httpExchange.getRequestMethod().equals(GET)) {
-                            String responseBody = GSON_CONVERTER.toJson(taskManager.getPrioritizedTasks());
-                            httpExchange.sendResponseHeaders(200, responseBody.getBytes().length);
-                            httpExchange.getResponseBody().write(responseBody.getBytes());
+                            sendPositiveResponse(httpExchange, taskManager.getPrioritizedTasks());
                             break;
                         }
                         httpExchange.sendResponseHeaders(405, 0);
                         break;
                     case TASK_SUBPATH:
                         if (httpExchange.getRequestMethod().equals(GET)) {
-
-                            UrlParams urlParams = UrlParams.getParams(httpExchange.getRequestURI());
-                            Optional<String> optionalId = urlParams.getFirst("id");
-                            if (optionalId.isPresent()) {
-                                Task task = taskManager.getTaskById(Integer.parseInt(optionalId.get()));
-                                if (task == null) {
-                                    httpExchange.sendResponseHeaders(404, 0);
-                                    break;
-                                }
-                                //TODO sendResponse(HttpExchange h, Object o)
-                                byte[] responseBody = GSON_CONVERTER.toJson(task).getBytes();
-                                httpExchange.sendResponseHeaders(200, responseBody.length);
-                                httpExchange.getResponseBody().write(responseBody);
-                                break;
-                            }
-                            List<Task> allTasks = taskManager.getAllTasks();
-                            byte[] responseBody = GSON_CONVERTER.toJson(allTasks).getBytes();
-                            httpExchange.sendResponseHeaders(200, responseBody.length);
-                            httpExchange.getResponseBody().write(responseBody);
+                            getTask(httpExchange);
                             break;
                         }
                         if (httpExchange.getRequestMethod().equals(POST)) {
-                            SingleTask taskToReturn = null;
-                            SingleTaskTO task = GSON_CONVERTER.fromJson(new InputStreamReader(httpExchange.getRequestBody()),
-                                    SingleTaskTO.class);
-                            if (task.getId() == null) {
-                                TaskCreateDto singleTask = new TaskCreateDto(task.getName(), task.getDescription(),
-                                        task.getStartTime(), task.getDurationInMins());
-                                taskToReturn = taskManager.saveSingleTask(singleTask);
-                            } else {
-                                SingleTask singleTask = new SingleTask(task.getName(), task.getId(), task.getDescription(),
-                                        task.getStatus(), task.getStartTime(), task.getDurationInMins());
-                                taskManager.update(singleTask);
-                                taskToReturn = singleTask;
-                            }
-                            byte[] responseBody = GSON_CONVERTER.toJson(taskToReturn).getBytes();
-                            httpExchange.sendResponseHeaders(200, responseBody.length);
-                            httpExchange.getResponseBody().write(responseBody);
+                            saveNewTaskOrUpdate(httpExchange, subPath);
                             break;
                         }
                         if (httpExchange.getRequestMethod().equals(DELETE)) {
-
+                            deleteTask(httpExchange);
                             break;
                         }
                 }
@@ -125,8 +90,77 @@ public class HttpTaskServer {
         server.start();
 
     }
+    public void sendPositiveResponse(HttpExchange h, Object o) throws IOException {
+        byte[] responseBody = GSON_CONVERTER.toJson(o).getBytes();
+        h.sendResponseHeaders(200, responseBody.length);
+        h.getResponseBody().write(responseBody);
+    }
 
+    // TODO добавить получение по типу
+    public void getTask(HttpExchange httpExchange) throws IOException {
+        UrlParams urlParams = UrlParams.getParams(httpExchange.getRequestURI());
+        Optional<String> optionalId = urlParams.getFirst("id");
+        if (optionalId.isPresent()) {
+            Task task = taskManager.getTaskById(Integer.parseInt(optionalId.get()));
+            if (task == null) {
+                httpExchange.sendResponseHeaders(404, 0);
+                return;
+            }
+            sendPositiveResponse(httpExchange, task);
+            return;
+        }
+        List<Task> allTasks = taskManager.getAllTasks();
+        sendPositiveResponse(httpExchange, allTasks);
+    }
 
+    // TODO добавить удаление по типу
+    private void deleteTask(HttpExchange httpExchange) throws IOException {
+        UrlParams urlParams = UrlParams.getParams(httpExchange.getRequestURI());
+        Optional<String> optionalId = urlParams.getFirst("id");
+        if (optionalId.isPresent()) {
+            if (taskManager.getTaskById(Integer.parseInt(optionalId.get())) == null) {
+                httpExchange.sendResponseHeaders(404, 0);
+                return;
+            }
+            taskManager.deleteTaskById(Integer.parseInt(optionalId.get()));
+            sendPositiveResponse(httpExchange, 0);
+            return;
+        }
+        taskManager.deleteAllTasks();
+        sendPositiveResponse(httpExchange, 0);
+    }
+
+    public void saveNewTaskOrUpdate(HttpExchange httpExchange, String subPath) throws IOException {
+        Task taskToReturn = null;
+        switch (subPath) {
+            case TASK_SUBPATH:
+                SingleTaskTO task = GSON_CONVERTER.fromJson(new InputStreamReader(
+                                httpExchange.getRequestBody()),
+                        SingleTaskTO.class);
+                if (task.getId() == null) {
+                    TaskCreateDto singleTask = new TaskCreateDto(task.getName(), task.getDescription(),
+                            task.getStartTime(), task.getDurationInMins());
+                    taskToReturn = taskManager.saveSingleTask(singleTask);
+                    if (taskManager.getTaskById(taskToReturn.getId()) == null) {
+                        httpExchange.sendResponseHeaders(406, 0);
+                        return;
+                    }
+                } else {
+                    SingleTask singleTask = new SingleTask(task.getName(), task.getId(),
+                            task.getDescription(), task.getStatus(), task.getStartTime(),
+                            task.getDurationInMins());
+                    taskManager.update(singleTask);
+                    taskToReturn = singleTask;
+                }
+                sendPositiveResponse(httpExchange, taskToReturn);
+                break;
+            case EPIC_SUBPATH:
+                break;
+            case SUBTASK_SUBPATH:
+                break;
+        }
+
+    }
     public static void main(String[] args) throws IOException, InterruptedException {
         HttpTaskServer server = new HttpTaskServer();
         server.run();
@@ -145,3 +179,4 @@ public class HttpTaskServer {
         }
     }
 }
+

@@ -7,38 +7,37 @@ import java.util.List;
 import java.util.Set;
 
 public interface TaskManager {
-    Set<Task> getPrioritizedTasks(); // проверила на сортировку по startTime
-    boolean isOvelappedTask(Task t);
-    List<Task> getHistory(); // проверила на совпадение сохраненной истории
+    Set<Task> getPrioritizedTasks(); // да
+    boolean isOvelappedTask(Task t); // ---
+    List<Task> getHistory(); //
 
-    SingleTask saveSingleTask(TaskCreateDto taskCreateDto); // проверила, сохраняется ли, и что сохраняется
+    SingleTask saveSingleTask(TaskCreateDto taskCreateDto); // да
 
-    void saveEpicTask(TaskCreateDto taskCreateDto); // проверила, сохраняется ли, и что сохраняется
+    void saveEpicTask(TaskCreateDto taskCreateDto); //
 
-    void saveSubTask(TaskCreateDto taskCreateDto, EpicTask epicTask); // проверила, сохраняется ли, и что сохраняется
+    void saveSubTask(TaskCreateDto taskCreateDto, EpicTask epicTask); //
 
-    ArrayList<Task> getAllTasks(); // проверила на null, по количеству тасков в списке
-    List<Task> filterTasksByType(Type type); // проверяем на null, а также сравниваем по типу
-    //, если вызвать незаведенный тип
+    ArrayList<Task> getAllTasks(); // да
+    List<Task> filterTasksByType(Type type); //
 
-    List<SubTask> getEpicSubTasks(int epicId); // проверяем на null, а также по количеству тасков в списке
-    // также проверяем работу с пустым списком задач
 
-    Task getTaskById(int id); // проверено со стандартным поведением и несуществующим id
+    List<SubTask> getEpicSubTasks(int epicId); //
 
-    Task findTaskById(int id); // вспомогательный метод, входит в метод getTaskById, не тестировала отдельно
+    Task getTaskById(int id); // да
 
-    void deleteTaskById(int id);
+    Task findTaskById(int id); // ---
 
-    void deleteTaskByType(Type type);
+    void deleteTaskById(int id); // да
 
-    void deleteSubTasksForEpic(int epicId);
+    void deleteTaskByType(Type type); //
 
-    void deleteAllTasks();
+    void deleteSubTasksForEpic(int epicId); //
 
-    void removeTaskFromHistory(Task task);
+    void deleteAllTasks(); // да
 
-    void update(Task task);
+    void removeTaskFromHistory(Task task); // ---
+
+    void update(Task task); // да для SingleTask
 
 
 }
