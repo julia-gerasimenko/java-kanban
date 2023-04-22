@@ -56,6 +56,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             Task task = taskWithEpicId.getKey();
             switch (task.getType()) {
                 case SINGLE:
+                    manager.prioritizedTasks.add(task);
                 case EPIC:
                     manager.taskById.put(task.getId(), task);
                     break;
@@ -65,6 +66,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     updatedSubTasks.add((SubTask) task);
                     epicTask.setSubTasks(updatedSubTasks);
                     epicTask.getStatus();
+                    manager.prioritizedTasks.add(task);
             }
         }
         if (!lines.get(lines.size() - 1).isEmpty()) {
@@ -123,14 +125,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     private LocalDateTime parseDateTime(String value) {
-        if (value == null || value.isBlank()) {
+        if (value == null || value.isBlank() || value.equals("null")) {
             return null;
         }
         return LocalDateTime.parse(value);
     }
 
     private Long parseLong(String value) {
-        if (value == null || value.isBlank()) {
+        if (value == null || value.isBlank() || value.equals("null")) {
             return null;
         }
         return Long.parseLong(value);
@@ -162,9 +164,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void saveSingleTask(TaskCreateDto taskCreateDto) {
-        super.saveSingleTask(taskCreateDto);
+    public SingleTask saveSingleTask(TaskCreateDto taskCreateDto) {
+        SingleTask singleTask = super.saveSingleTask(taskCreateDto);
         save();
+        return singleTask;
     }
 
     @Override

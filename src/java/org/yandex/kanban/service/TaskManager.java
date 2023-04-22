@@ -1,9 +1,6 @@
 package org.yandex.kanban.service;
 
-import org.yandex.kanban.model.EpicTask;
-import org.yandex.kanban.model.SubTask;
-import org.yandex.kanban.model.Task;
-import org.yandex.kanban.model.Type;
+import org.yandex.kanban.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +11,7 @@ public interface TaskManager {
     boolean isOvelappedTask(Task t);
     List<Task> getHistory(); // проверила на совпадение сохраненной истории
 
-    void saveSingleTask(TaskCreateDto taskCreateDto); // проверила, сохраняется ли, и что сохраняется
+    SingleTask saveSingleTask(TaskCreateDto taskCreateDto); // проверила, сохраняется ли, и что сохраняется
 
     void saveEpicTask(TaskCreateDto taskCreateDto); // проверила, сохраняется ли, и что сохраняется
 

@@ -54,7 +54,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void saveSingleTask(TaskCreateDto taskCreateDto) {
+    public SingleTask saveSingleTask(TaskCreateDto taskCreateDto) {
         int nextFreeId = idGenerator.getNextFreeId();
         SingleTask singleTask = new SingleTask(
                 taskCreateDto.getName(),
@@ -67,6 +67,7 @@ public class InMemoryTaskManager implements TaskManager {
             taskById.put(singleTask.getId(), singleTask);
             prioritizedTasks.add(singleTask);
         }
+        return singleTask;
     }
 
     @Override
