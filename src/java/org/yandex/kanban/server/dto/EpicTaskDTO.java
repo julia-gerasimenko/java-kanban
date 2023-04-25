@@ -1,16 +1,16 @@
-package org.yandex.kanban.server.to;
+package org.yandex.kanban.server.dto;
 
 import org.yandex.kanban.model.Status;
+import org.yandex.kanban.model.SubTask;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-public class SingleTaskTO {
+public class EpicTaskDTO {
     private String name;
     private Integer id;
     private String description;
     private Status status;
-    private Long durationInMins;
-    private LocalDateTime startTime;
+    private List<SubTask> subTasks;
 
     public String getName() {
         return name;
@@ -44,19 +44,11 @@ public class SingleTaskTO {
         this.status = status;
     }
 
-    public Long getDurationInMins() {
-        return durationInMins;
+    public List<SubTask> getSubTasks() {
+        return subTasks;
     }
 
-    public void setDurationInMins(Long durationInMins) {
-        this.durationInMins = durationInMins;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
+    public void setSubTasks(List<SubTask> subTasks) {
+        this.subTasks = subTasks;
     }
 }

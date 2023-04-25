@@ -33,7 +33,7 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
                 LocalDateTime.of(2023, Month.APRIL, 27, 0, 0, 0),
                 30L), (EpicTask) taskManager.findTaskById(1)); // id = 2
         List<String> listToCompare = List.of(
-                "SubTask{id=2, taskStatus=NEW, taskName=Sub task, taskDescription=Sub step}",
+                "SubTask{id=2, taskStatus=NEW, taskName=Sub task, taskDescription=Sub step, epicId=1}",
                 "SingleTask{id=0, taskStatus=NEW, taskName=Single task, taskType=SINGLE, " +
                         "taskDescription=The first step}");
         assertEquals(listToCompare.toString(), taskManager.getPrioritizedTasks().toString(),
@@ -42,10 +42,10 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
         taskManager.saveSubTask(new TaskCreateDto("Sub task", "Sub 2 step"),
                 (EpicTask) taskManager.findTaskById(1)); // id = 3
         List<String> listToCompareTwo = List.of(
-                "SubTask{id=2, taskStatus=NEW, taskName=Sub task, taskDescription=Sub step}",
+                "SubTask{id=2, taskStatus=NEW, taskName=Sub task, taskDescription=Sub step, epicId=1}",
                 "SingleTask{id=0, taskStatus=NEW, taskName=Single task, taskType=SINGLE, " +
                         "taskDescription=The first step}",
-                "SubTask{id=3, taskStatus=NEW, taskName=Sub task, taskDescription=Sub 2 step}");
+                "SubTask{id=3, taskStatus=NEW, taskName=Sub task, taskDescription=Sub 2 step, epicId=1}");
         assertEquals(listToCompareTwo.toString(), taskManager.getPrioritizedTasks().toString(),
                 "Некорректная сортировка задач при добавлении задачи с отсутствующим временем");
 
@@ -113,7 +113,8 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
 
         assertEquals(List.of("SingleTask{id=0, taskStatus=NEW, taskName=Test Single task, " +
                                 "taskType=SINGLE, taskDescription=Testing single}",
-                        "SubTask{id=2, taskStatus=NEW, taskName=Test Sub task, taskDescription=Testing sub}").toString(),
+                        "SubTask{id=2, taskStatus=NEW, taskName=Test Sub task, " +
+                                "taskDescription=Testing sub, epicId=1}").toString(),
                 taskManager.getPrioritizedTasks().toString(),
                 "Пересекающиеся задачи сохраняются некорректно");
     }
@@ -180,7 +181,8 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
     @Test
     public void shouldSavSubTask() {
         taskManager.saveEpicTask(new TaskCreateDto("Test Epic task", "Testing epic")); // id =0
-        SubTask subTask = new SubTask("Test Sub task", 1, "Testing sub", Status.NEW, null, null);
+        SubTask subTask = new SubTask("Test Sub task", 1, "Testing sub",
+                Status.NEW, null, null, 0);
         taskManager.saveSubTask(new TaskCreateDto(subTask.getName(),
                 subTask.getDescription()), (EpicTask) taskManager.findTaskById(0)); // id = 1
 
@@ -201,7 +203,7 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
     public void shouldSavSubTaskWithDateTimeAndUpdateEpicsDateTime() {
         taskManager.saveEpicTask(new TaskCreateDto("Test Epic task", "Testing epic")); // id =0
         SubTask subTask = new SubTask("Test Sub task", 1, "Testing sub", Status.NEW,
-                LocalDateTime.of(2023, Month.APRIL, 27, 0, 0, 0), 30L);
+                LocalDateTime.of(2023, Month.APRIL, 27, 0, 0, 0), 30L, 0);
         taskManager.saveSubTask(new TaskCreateDto(subTask.getName(), subTask.getDescription(),
                 LocalDateTime.of(2023, Month.APRIL, 27, 0, 0, 0),
                 30L), (EpicTask) taskManager.findTaskById(0)); // id = 1
@@ -281,11 +283,12 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
         taskManager.saveEpicTask(new TaskCreateDto("Test Epic task", "Testing epic")); // id =0
 
         SubTask subTask = new SubTask("Test Sub task", 1, "Testing sub", Status.NEW,
-                null, null);
+                null, null, 0);
         taskManager.saveSubTask(new TaskCreateDto(subTask.getName(),
                 subTask.getDescription()), (EpicTask) taskManager.findTaskById(0)); // id = 1
 
-        SubTask subTaskTwo = new SubTask("Test 2nd Sub task", 2, "Testing sub 2", Status.NEW, null, null);
+        SubTask subTaskTwo = new SubTask("Test 2nd Sub task", 2, "Testing sub 2", Status.NEW,
+                null, null, 0);
         taskManager.saveSubTask(new TaskCreateDto(subTaskTwo.getName(),
                 subTaskTwo.getDescription()), (EpicTask) taskManager.findTaskById(0)); // id = 2
 
@@ -311,7 +314,8 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
 
         taskManager.saveSubTask(new TaskCreateDto("Test Sub task", "Testing sub"),
                 (EpicTask) taskManager.getTaskById(0)); // id = 1
-        SubTask subTask = new SubTask("Test Sub task", 1, "Testing sub", Status.NEW, null, null);
+        SubTask subTask = new SubTask("Test Sub task", 1, "Testing sub", Status.NEW,
+                null, null, 0);
         assertEquals(subTask, taskManager.getTaskById(1), "Задача с id 1 не найдена");
 
         assertNull(taskManager.getTaskById(3), "Некорректная обработка задачи с несуществующим id");
@@ -436,7 +440,7 @@ public abstract class TaskManagerTest<TTaskManager extends TaskManager> {
         EpicTask epicTask = new EpicTask("Corrected Epic", 1, "Testing correction", null,
                 Status.DONE);
         SubTask subTask = new SubTask("corrected Sub", 2, "Testing correction", Status.IN_PROGRESS,
-                null, null);
+                null, null, 1);
 
         taskManager.update(singleTask);
         assertEquals(singleTask, taskManager.getTaskById(0), "SingeTask не обновлена");

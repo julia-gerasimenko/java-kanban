@@ -9,19 +9,18 @@ import java.util.Set;
 public interface TaskManager {
     Set<Task> getPrioritizedTasks(); // да
     boolean isOvelappedTask(Task t); // ---
-    List<Task> getHistory(); //
+    List<Task> getHistory(); // да
 
     SingleTask saveSingleTask(TaskCreateDto taskCreateDto); // да
 
-    void saveEpicTask(TaskCreateDto taskCreateDto); //
+    EpicTask saveEpicTask(TaskCreateDto taskCreateDto); // да
 
-    void saveSubTask(TaskCreateDto taskCreateDto, EpicTask epicTask); //
+    SubTask saveSubTask(TaskCreateDto taskCreateDto, EpicTask epicTask); // !!!
 
     ArrayList<Task> getAllTasks(); // да
-    List<Task> filterTasksByType(Type type); //
+    List<Task> filterTasksByType(Type type); // да
 
-
-    List<SubTask> getEpicSubTasks(int epicId); //
+    List<SubTask> getEpicSubTasks(int epicId); // да
 
     Task getTaskById(int id); // да
 
@@ -29,15 +28,15 @@ public interface TaskManager {
 
     void deleteTaskById(int id); // да
 
-    void deleteTaskByType(Type type); //
+    void deleteTaskByType(Type type); // да
 
-    void deleteSubTasksForEpic(int epicId); //
+    void deleteSubTasksForEpic(int epicId); // да
 
     void deleteAllTasks(); // да
 
     void removeTaskFromHistory(Task task); // ---
 
-    void update(Task task); // да для SingleTask
+    void update(Task task); // да для SingleTask, EpicTask, !!!
 
 
 }

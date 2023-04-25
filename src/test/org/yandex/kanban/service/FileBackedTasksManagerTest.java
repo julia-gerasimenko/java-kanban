@@ -56,7 +56,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<TaskManager> {
         List<String> result = Files.readAllLines(testFilePath);
         assertEquals(List.of(
                         "id,type,name,status,description,epic,startTime,durationInMins",
-                        "0,EPIC,Test Epic task,NEW,Testing epic,,,",""),
+                        "0,EPIC,Test Epic task,NEW,Testing epic,,,,",""),
                 result, "Список задач в файле после сохранения не совпадает");
 
 

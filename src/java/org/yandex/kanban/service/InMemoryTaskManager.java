@@ -71,7 +71,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void saveEpicTask(TaskCreateDto taskCreateDto) {
+    public EpicTask saveEpicTask(TaskCreateDto taskCreateDto) {
         int nextFreeId = idGenerator.getNextFreeId();
         ArrayList<SubTask> subTasks = new ArrayList<>();
         EpicTask epicTask = new EpicTask(
@@ -82,10 +82,11 @@ public class InMemoryTaskManager implements TaskManager {
                 Status.NEW
         );
         taskById.put(epicTask.getId(), epicTask);
+        return epicTask;
     }
 
     @Override
-    public void saveSubTask(TaskCreateDto taskCreateDto, EpicTask epicTask) {
+    public SubTask saveSubTask(TaskCreateDto taskCreateDto, EpicTask epicTask) {
         int nextFreeId = idGenerator.getNextFreeId();
         List<SubTask> updatedSubTasks = epicTask.getSubTasks();
         SubTask subTask = new SubTask(
@@ -94,7 +95,8 @@ public class InMemoryTaskManager implements TaskManager {
                 taskCreateDto.getDescription(),
                 Status.NEW,
                 taskCreateDto.getStartTime(),
-                taskCreateDto.getDurationInMins());
+                taskCreateDto.getDurationInMins(),
+                epicTask.getId());
         if (!isOvelappedTask(subTask)) {
             updatedSubTasks.add(subTask);
             epicTask.setSubTasks(updatedSubTasks);
@@ -102,6 +104,7 @@ public class InMemoryTaskManager implements TaskManager {
             epicTask.recalculateTimeProperties();
             prioritizedTasks.add(subTask);
         }
+        return subTask;
     }
 
     @Override
@@ -252,25 +255,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void update(Task task) {
-        if (!task.getType().equals(SUB)) {
-            updatePrioritizedTasks(task);
-            taskById.put(task.getId(), task);
-        }
-        for (Task epicTaskToFind : taskById.values()) {
-            if (!EPIC.equals(epicTaskToFind.getType())) {
-                continue;
+        if (!isOvelappedTask(task)) {
+            if (!task.getType().equals(SUB)) {
+                updatePrioritizedTasks(task);
+                taskById.put(task.getId(), task);
             }
-            EpicTask epicTask = (EpicTask) epicTaskToFind;
-            List<SubTask> listOfSubTasks = epicTask.getSubTasks();
-            for (SubTask subToFind : listOfSubTasks) {
-                if (subToFind.getId() == task.getId()) {
-                    int indexOfSub = epicTask.getSubTasks().indexOf(subToFind);
-                    updatePrioritizedTasks(subToFind);
-                    listOfSubTasks.remove(indexOfSub);
-                    listOfSubTasks.add(indexOfSub, (SubTask) task);
-                    epicTask.setSubTasks(listOfSubTasks);
-                    epicTask.getStatus();
-                    break;
+            for (Task epicTaskToFind : taskById.values()) {
+                if (!EPIC.equals(epicTaskToFind.getType())) {
+                    continue;
+                }
+                EpicTask epicTask = (EpicTask) epicTaskToFind;
+                List<SubTask> listOfSubTasks = epicTask.getSubTasks();
+                for (SubTask subToFind : listOfSubTasks) {
+                    if (subToFind.getId() == task.getId()) {
+                        int indexOfSub = epicTask.getSubTasks().indexOf(subToFind);
+                        updatePrioritizedTasks(subToFind);
+                        listOfSubTasks.remove(indexOfSub);
+                        listOfSubTasks.add(indexOfSub, (SubTask) task);
+                        epicTask.setSubTasks(listOfSubTasks);
+                        epicTask.getStatus();
+                        break;
+                    }
                 }
             }
         }

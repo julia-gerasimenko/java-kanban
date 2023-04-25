@@ -18,7 +18,7 @@ public abstract class Task  implements Overlappable {
 
     public String getDescription() { return description; }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
