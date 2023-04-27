@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.yandex.kanban.model.EpicTask;
 import org.yandex.kanban.model.SingleTask;
-import org.yandex.kanban.model.SubTask;
 import org.yandex.kanban.model.Type;
 import org.yandex.kanban.server.dto.TaskManagerStateDTO;
 import org.yandex.kanban.server.util.LocalDateTimeAdapter;
@@ -23,7 +22,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
     private static final String STATE_KEY = "task-manager-storage-state";
     private final KVTaskClient kvTaskClient;
 
-    private static final Gson GSON_CONVERTER = new GsonBuilder().serializeNulls()
+    protected static final Gson GSON_CONVERTER = new GsonBuilder().serializeNulls()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
 

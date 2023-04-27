@@ -2,10 +2,6 @@ package org.yandex.kanban.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.yandex.kanban.model.*;
@@ -42,7 +38,8 @@ public class HttpTaskServer {
     private static final Gson GSON_CONVERTER = new GsonBuilder().serializeNulls()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
-    private final TaskManager taskManager;
+    protected final TaskManager taskManager;
+    protected HttpServer server;
 
     public HttpTaskServer(TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -57,7 +54,7 @@ public class HttpTaskServer {
     }
 
     public void run() throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
+        server = HttpServer.create(new InetSocketAddress(PORT), 0);
         server.createContext("/tasks", httpExchange -> {
             try {
                 String subPath = httpExchange.getRequestURI().getPath().
@@ -121,13 +118,17 @@ public class HttpTaskServer {
         server.start();
     }
 
+    public void stop() {
+        server.stop(0);
+    }
+
     public void sendPositiveResponse(HttpExchange h, Object o) throws IOException {
         byte[] responseBody = GSON_CONVERTER.toJson(o).getBytes();
         h.sendResponseHeaders(200, responseBody.length);
         h.getResponseBody().write(responseBody);
     }
 
-    private void getHistoryTasks(HttpExchange httpExchange) throws IOException {
+    protected void getHistoryTasks(HttpExchange httpExchange) throws IOException {
         List<Task> historyTasks = taskManager.getHistory();
         sendPositiveResponse(httpExchange, historyTasks);
     }
@@ -159,7 +160,7 @@ public class HttpTaskServer {
         sendPositiveResponse(httpExchange, allTasks);
     }
 
-    private void deleteTask(HttpExchange httpExchange) throws IOException {
+    protected void deleteTask(HttpExchange httpExchange) throws IOException {
         UrlParams urlParams = UrlParams.getParams(httpExchange.getRequestURI());
         Optional<String> optionalId = urlParams.getFirst("id");
         if (optionalId.isPresent()) {
@@ -185,7 +186,7 @@ public class HttpTaskServer {
         sendPositiveResponse(httpExchange, 0);
     }
 
-    public void saveNewTaskOrUpdate(HttpExchange httpExchange, String subPath) throws IOException {
+    protected void saveNewTaskOrUpdate(HttpExchange httpExchange, String subPath) throws IOException {
         Task taskToReturn = null;
         switch (subPath) {
             case TASK_SUBPATH:
@@ -275,7 +276,7 @@ public class HttpTaskServer {
         }
     }
 
-    private void deleteEpicSubTasks(HttpExchange httpExchange) throws IOException {
+    protected void deleteEpicSubTasks(HttpExchange httpExchange) throws IOException {
         UrlParams urlParams = UrlParams.getParams(httpExchange.getRequestURI());
         Optional<String> optionalEpicId = urlParams.getFirst("id");
         if (optionalEpicId.isPresent()) {
@@ -288,7 +289,7 @@ public class HttpTaskServer {
         }
     }
 
-    private void GetEpicSubTaskList(HttpExchange httpExchange) throws IOException {
+    protected void GetEpicSubTaskList(HttpExchange httpExchange) throws IOException {
         UrlParams urlParams = UrlParams.getParams(httpExchange.getRequestURI());
         Optional<String> optionalEpicId = urlParams.getFirst("id");
         if (optionalEpicId.isPresent()) {
