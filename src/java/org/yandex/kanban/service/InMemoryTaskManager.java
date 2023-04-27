@@ -9,9 +9,9 @@ import static org.yandex.kanban.model.Type.SUB;
 
 public class InMemoryTaskManager implements TaskManager {
     private final IdGenerator idGenerator;
-    final HashMap<Integer, Task> taskById;
-    HistoryManager historyManager;
-    TreeSet<Task> prioritizedTasks;
+    protected final HashMap<Integer, Task> taskById;
+    protected HistoryManager historyManager;
+    protected TreeSet<Task> prioritizedTasks;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
@@ -115,13 +115,23 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> filterTasksByType(Type type) {
         List<Task> tasks = new ArrayList<>();
-        for (Task task : taskById.values()) {
-            if (type.equals(task.getType())) {
-                tasks.add(task);
-            }
-        }
-        if (tasks.isEmpty()) {
-            return Collections.emptyList();
+        switch (type) {
+            case SINGLE:
+            case EPIC:
+                for (Task task : taskById.values()) {
+                    if (type.equals(task.getType())) {
+                        tasks.add(task);
+                    }
+                }
+                break;
+            case SUB:
+                for (int i = 0; i < taskById.size(); i++) {
+                    if (EPIC.equals(taskById.get(i).getType())) {
+                        EpicTask epicTask = (EpicTask) taskById.get(i);
+                        tasks.addAll(epicTask.getSubTasks());
+                    }
+                }
+                break;
         }
         return tasks;
     }
@@ -202,6 +212,7 @@ public class InMemoryTaskManager implements TaskManager {
                         taskById.remove(taskById.get(i).getId());
                     }
                 }
+                break;
             case SUB: // если мы хотим удалить все сабтаски у всех эпиков
                 for (int i = 0; i < taskById.size(); i++) {
                     if (EPIC.equals(taskById.get(i).getType())) {
@@ -211,6 +222,7 @@ public class InMemoryTaskManager implements TaskManager {
                         epicTask.getSubTasks().clear();
                     }
                 }
+                break;
         }
     }
 

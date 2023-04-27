@@ -12,6 +12,8 @@ import org.yandex.kanban.model.*;
 import org.yandex.kanban.server.dto.EpicTaskDTO;
 import org.yandex.kanban.server.dto.SingleTaskDTO;
 import org.yandex.kanban.server.dto.SubTaskDTO;
+import org.yandex.kanban.server.util.LocalDateTimeAdapter;
+import org.yandex.kanban.server.util.UrlParams;
 import org.yandex.kanban.service.Managers;
 import org.yandex.kanban.service.TaskCreateDto;
 import org.yandex.kanban.service.TaskManager;
@@ -22,7 +24,6 @@ import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
@@ -48,7 +49,11 @@ public class HttpTaskServer {
     }
 
     public HttpTaskServer() {
-        taskManager = Managers.taskManager();
+        try {
+            taskManager = Managers.taskManager();
+        } catch (Throwable ex) {
+            throw new IllegalStateException("Не удалось создать taskManager", ex);
+        }
     }
 
     public void run() throws IOException {
@@ -84,12 +89,10 @@ public class HttpTaskServer {
                             break;
                         }
                     case SUBTASK_EPIC_SUBPATH: {
-                        //TODO протестировать
                         if (httpExchange.getRequestMethod().equals(GET)) {
                             GetEpicSubTaskList(httpExchange);
                             break;
                         }
-                        //TODO протестировать
                         if (httpExchange.getRequestMethod().equals(DELETE)) {
                             deleteEpicSubTasks(httpExchange);
                             break;
@@ -208,7 +211,7 @@ public class HttpTaskServer {
                     taskToReturn = singleTask;
                 }
                 if (taskManager.getTaskById(taskToReturn.getId()) == null) {
-                    // задача не сохранилась из-за overlapped
+                    // если задача не сохранилась из-за overlapped
                     httpExchange.sendResponseHeaders(406, 0);
                     return;
                 }
@@ -264,7 +267,6 @@ public class HttpTaskServer {
                     taskToReturn = subTask;
                 }
                 if (taskManager.getTaskById(taskToReturn.getId()) == null) {
-                    // задача не сохранилась из-за overlapped
                     httpExchange.sendResponseHeaders(406, 0);
                     return;
                 }
@@ -301,30 +303,10 @@ public class HttpTaskServer {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        HttpTaskServer server = new HttpTaskServer();
-        server.run();
-        TimeUnit.SECONDS.sleep(30);
+
+        new HttpTaskServer().run();
     }
 
-    private static final class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
-        @Override
-        public void write(final JsonWriter jsonWriter, final LocalDateTime localDateTime) throws IOException {
-            if (localDateTime == null) {
-                jsonWriter.nullValue();
-                return;
-            }
-            jsonWriter.value(localDateTime.toString());
-        }
 
-        @Override
-        public LocalDateTime read(final JsonReader jsonReader) throws IOException {
-            final JsonToken peek = jsonReader.peek();
-            if (peek == JsonToken.NULL) {
-                jsonReader.nextNull();
-                return null;
-            }
-            return LocalDateTime.parse(jsonReader.nextString());
-        }
-    }
 }
 

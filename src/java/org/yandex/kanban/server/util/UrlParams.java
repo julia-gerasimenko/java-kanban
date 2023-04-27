@@ -1,4 +1,4 @@
-package org.yandex.kanban.server;
+package org.yandex.kanban.server.util;
 
 import java.net.MalformedURLException;
 import java.net.URI;

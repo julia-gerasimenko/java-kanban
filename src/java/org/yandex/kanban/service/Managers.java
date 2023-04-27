@@ -1,13 +1,18 @@
 package org.yandex.kanban.service;
 
-import java.io.File;
-import java.nio.file.Path;
+import org.yandex.kanban.server.HttpTaskManager;
+import org.yandex.kanban.server.KVServer;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 
 public abstract class Managers {
     private static HistoryManager historyManager;
-    private static final Path STORAGE_PATH = Path.of("src/resources/org/yandex/kanban/taskManagerStorage.csv");
-    private static final File TASK_MANAGER_STORAGE =
-            Path.of("src/resources/org/yandex/kanban/taskManagerStorage.csv").toFile();
+    private static TaskManager taskManager;
+    private static KVServer kvServer;
+    private static final int KEY_VALUE_SERVER_PORT = 8078;
+    private static final String KEY_VALUE_URL = "http://localhost:" + KEY_VALUE_SERVER_PORT + "/";
 
     public static HistoryManager historyManager() {
         if (historyManager == null) {
@@ -16,12 +21,18 @@ public abstract class Managers {
         return historyManager;
     }
 
-    public static TaskManager taskManager() {
-        TaskManager taskManager;
-        if (!TASK_MANAGER_STORAGE.isFile()) {
-            taskManager = new FileBackedTasksManager(historyManager(), STORAGE_PATH);
-        } else taskManager = FileBackedTasksManager.loadFromFile(STORAGE_PATH);
+    public static TaskManager taskManager() throws MalformedURLException, URISyntaxException {
+        if (taskManager == null) {
+            taskManager = new HttpTaskManager(historyManager(), KEY_VALUE_URL);
+        }
         return taskManager;
+    }
+
+    public static KVServer getKVServer() throws IOException {
+        if (kvServer == null) {
+            kvServer = new KVServer(KEY_VALUE_SERVER_PORT);
+        }
+        return kvServer;
     }
 }
 
