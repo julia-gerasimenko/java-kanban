@@ -2,24 +2,22 @@ package org.yandex.kanban.server.util;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class UrlParams {
-    private final HashMap<String, List<String>> params;
+    private final Map<String, List<String>> params;
 
-    private UrlParams(HashMap<String, List<String>> params) {
+    private UrlParams(Map<String, List<String>> params) {
         this.params = params;
     }
 
     public static UrlParams getParams(URI uri) throws MalformedURLException {
         if(uri.getRawQuery() == null){
-            return new UrlParams(new HashMap<>());
+            Map<String, List<String>> map = new HashMap<>();
+            return new UrlParams(map);
         }
         String[] pairs = uri.getRawQuery().split("&");
-        HashMap<String, List<String>> map = new HashMap<>();
+        Map<String, List<String>> map = new HashMap<>();
         for(String param: pairs){
             String[] pair = param.split("=");
             String key = pair[0];

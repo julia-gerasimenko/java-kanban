@@ -43,7 +43,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void shouldSaveSingleTask() throws IOException {
+    public void shouldSaveSingleTask() throws IOException, InterruptedException {
         String payload = readResource("src/testResources/createSingleTask.json");
         String expected = readResource("src/testResources/singleTaskWithId.json");
 
@@ -57,7 +57,7 @@ public class HttpTaskServerTest {
 
 
     @Test
-    public void shouldReturnSingleTask() throws IOException {
+    public void shouldReturnSingleTask() throws IOException, InterruptedException {
         TaskCreateDto singleTask = new TaskCreateDto("Single task", "testing single");
         httpTaskServer.taskManager.saveSingleTask(singleTask);
 
@@ -77,7 +77,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void shouldDeleteSingleTask() throws IOException {
+    public void shouldDeleteSingleTask() throws IOException, InterruptedException {
         TaskCreateDto singleTask = new TaskCreateDto("Single task", "testing single");
         httpTaskServer.taskManager.saveSingleTask(singleTask);
 
@@ -93,8 +93,7 @@ public class HttpTaskServerTest {
         return Files.readString(Path.of(path));
     }
 
-    private Optional<String> sendRequest(HttpRequest request) {
-        try {
+    private Optional<String> sendRequest(HttpRequest request) throws IOException, InterruptedException {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers
                     .ofString(StandardCharsets.UTF_8));
             if (response.statusCode() != 200) {
@@ -103,10 +102,6 @@ public class HttpTaskServerTest {
                 return Optional.empty();
             }
             return Optional.ofNullable(response.body());
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
-            return Optional.empty();
-        }
+
     }
 }

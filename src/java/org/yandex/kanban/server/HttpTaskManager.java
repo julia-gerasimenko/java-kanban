@@ -26,6 +26,8 @@ public class HttpTaskManager extends FileBackedTasksManager {
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
 
+    // если честно, не разобралась, как это сделать, спрошу на Q&A  у наставника
+
     public HttpTaskManager(HistoryManager historyManager, String kvUrl) throws MalformedURLException, URISyntaxException {
         super(historyManager, null);
         this.kvTaskClient = new KVTaskClient(new URL(kvUrl));
@@ -44,9 +46,8 @@ public class HttpTaskManager extends FileBackedTasksManager {
                 .map(task -> (EpicTask) task).collect(Collectors.toList()));
         try {
             kvTaskClient.put(STATE_KEY, GSON_CONVERTER.toJson(taskManagerStateDTO));
-        } catch (Throwable ex) {
-            System.out.println("Не удалось сохранить состояние.");
-            ex.printStackTrace();
+        } catch (RuntimeException | MalformedURLException | URISyntaxException ex) {
+             throw new RuntimeException("Не удалось сохранить состояние");
         }
     }
 
@@ -70,9 +71,8 @@ public class HttpTaskManager extends FileBackedTasksManager {
                 historyManager.addTaskToHistory(findTaskById(id));
             }
 
-        } catch (Throwable ex) {
-            System.out.println("Не удалось загрузить состояние");
-            ex.printStackTrace();
+        } catch (RuntimeException | MalformedURLException | URISyntaxException ex) {
+            throw new RuntimeException("Не удалось загрузить состояние");
         }
     }
 }
